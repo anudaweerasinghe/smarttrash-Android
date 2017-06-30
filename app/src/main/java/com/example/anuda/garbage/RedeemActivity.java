@@ -1,5 +1,6 @@
 package com.example.anuda.garbage;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.hardware.Camera;
@@ -23,22 +24,23 @@ import org.w3c.dom.Text;
 
 import java.io.IOException;
 
+
+
 public class RedeemActivity extends AppCompatActivity {
 
     SurfaceView cameraView;
     TextView barcodeInfo;
     BarcodeDetector barcodeDetector;
     CameraSource cameraSource;
-    Button verify;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_redeem);
 
+
         cameraView = (SurfaceView)findViewById(R.id.camera_view);
         barcodeInfo = (TextView)findViewById(R.id.code_info);
-        verify=(Button)findViewById(R.id.button_verify);
 
         barcodeDetector =
                 new BarcodeDetector.Builder(this)
@@ -71,10 +73,6 @@ public class RedeemActivity extends AppCompatActivity {
             }
         });
 
-                final ProgressDialog progressDialog = new ProgressDialog(RedeemActivity.this,
-                        R.style.AppTheme_Dark_Dialog);
-
-
                 barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
                     @Override
                     public void release() {
@@ -91,9 +89,17 @@ public class RedeemActivity extends AppCompatActivity {
                                             barcodes.valueAt(0).displayValue
                                     );
 
+//                                    final ProgressDialog progressDialog = new ProgressDialog(RedeemActivity.this,
+//                                            R.style.AppTheme_Dark_Dialog);
+//
+//                                    progressDialog.setIndeterminate(true);
+//                                    progressDialog.setTitle("Successfully Verified!");
+//                                    progressDialog.setMessage("You will Receive your reward shortly");
+//                                    progressDialog.show();
                                     Intent intentNew = new Intent(RedeemActivity.this, Dashboard.class);
                                     startActivity(intentNew);
                                     RedeemActivity.this.finish();
+//                                    progressDialog.dismiss();
 
                                 }
                             });

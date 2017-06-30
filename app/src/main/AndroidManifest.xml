@@ -18,8 +18,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Dark">
         <activity
-            android:name=".Dashboard"
-            android:label="Dashboard"
+            android:name=".RedeemActivity"
+            android:label="Redeem"
             android:theme="@style/AppTheme.Dark" />
         <activity
             android:name=".SignupActivity"
@@ -52,7 +52,7 @@
             android:name=".MapsActivity"
             android:label="@string/Nearby"
             android:theme="@style/AppTheme.Dark" />
-        <activity android:name=".RedeemActivity">
+        <activity android:name=".Dashboard">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
