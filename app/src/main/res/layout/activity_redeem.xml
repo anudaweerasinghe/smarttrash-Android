@@ -21,14 +21,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true" />
 
-    <Button
-        android:id="@+id/button_verify"
-        android:layout_width="450px"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/code_info"
-        android:layout_centerHorizontal="true"
-        android:background="@color/accent"
-        android:text="Verify" />
+
 
 </RelativeLayout>
 
