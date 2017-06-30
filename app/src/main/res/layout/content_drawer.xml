@@ -53,7 +53,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="15dp"
-            android:background="@color/primary"
+            android:background="@color/primary_dark"
             android:elevation="8dp"
             android:text="Dispose"
             android:textSize="24sp"

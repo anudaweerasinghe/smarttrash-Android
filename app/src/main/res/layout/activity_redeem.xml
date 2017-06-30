@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        tools:context="com.example.anuda.garbage.RedeemActivity"
-        android:layout_width="match_parent" android:layout_height="match_parent">
-
-        <SurfaceView
-            android:id="@+id/camera_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/code_info"
-            android:textSize="20sp"
-            android:layout_marginLeft="16dp"
-            android:text="Nothing to read."
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true" />
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout_redeem"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.example.anuda.garbage.RedeemActivity"
+    tools:openDrawer="start">
 
 
+    <include
+        layout="@layout/redeem_app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-</RelativeLayout>
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        android:elevation="10dp"
+        android:background="@color/black"
+        app:headerLayout="@layout/nav_header_drawer"
+        app:menu="@menu/activity_drawer_drawer" />
+
+
+
+</android.support.v4.widget.DrawerLayout>
 
