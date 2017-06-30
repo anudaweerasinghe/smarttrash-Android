@@ -1,6 +1,7 @@
 package com.example.anuda.garbage;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -47,37 +49,7 @@ public class RedeemActivity extends AppCompatActivity {
                 .Builder(this, barcodeDetector)
                 .build();
 
-        verify.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final ProgressDialog progressDialog = new ProgressDialog(RedeemActivity.this,
-                        R.style.AppTheme_Dark_Dialog);
-                progressDialog.setIndeterminate(true);
-                progressDialog.setMessage("Verifying...");
-                progressDialog.show();
-                barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
-                    @Override
-                    public void release() {
-                    }
 
-                    @Override
-                    public void receiveDetections(Detector.Detections<Barcode> detections) {
-                        final SparseArray<Barcode> barcodes = detections.getDetectedItems();
-
-                        if (barcodes.size() != 0) {
-                            barcodeInfo.post(new Runnable() {    // Use the post method of the TextView
-                                public void run() {
-                                    barcodeInfo.setText(    // Update the TextView
-                                            barcodes.valueAt(0).displayValue
-                                    );
-                                    progressDialog.dismiss();
-                                }
-                            });
-                        }
-                    }
-                });
-            }
-        });
 
         cameraView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
@@ -99,9 +71,39 @@ public class RedeemActivity extends AppCompatActivity {
             }
         });
 
+                final ProgressDialog progressDialog = new ProgressDialog(RedeemActivity.this,
+                        R.style.AppTheme_Dark_Dialog);
+
+
+                barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
+                    @Override
+                    public void release() {
+                    }
+
+                    @Override
+                    public void receiveDetections(Detector.Detections<Barcode> detections) {
+                        final SparseArray<Barcode> barcodes = detections.getDetectedItems();
+
+                        if (barcodes.size() != 0) {
+                            barcodeInfo.post(new Runnable() {    // Use the post method of the TextView
+                                public void run() {
+                                    barcodeInfo.setText(    // Update the TextView
+                                            barcodes.valueAt(0).displayValue
+                                    );
+
+                                    Intent intentNew = new Intent(RedeemActivity.this, Dashboard.class);
+                                    startActivity(intentNew);
+                                    RedeemActivity.this.finish();
+
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+
+
 
     }
 
 
-
-}
