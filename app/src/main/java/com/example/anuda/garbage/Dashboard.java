@@ -148,7 +148,12 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
             Intent intentNew = new Intent(Dashboard.this, MapsActivity.class);
             startActivity(intentNew);
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_redeem) {
+            Intent intentNew = new Intent(Dashboard.this, RedeemActivity.class);
+            startActivity(intentNew);
+
+        }
+        else if (id == R.id.nav_share) {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT,"Download IdeaTrash Now!");
