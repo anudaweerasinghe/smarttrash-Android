@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@drawable/logo_dashboard"
+            android:title="Dashboard" />
+        <item
+            android:id="@+id/nav_redeem"
+            android:icon="@drawable/logo_redeem"
+            android:title="Redeem" />
+        <item
+            android:id="@+id/nav_map"
+            android:icon="@drawable/logo_map"
+            android:title="Nearby" />
+        <item
+            android:id="@+id/nav_collector"
+            android:icon="@drawable/logo_collector"
+            android:title="I Want to Be a Collector" />
+        <item
+            android:id="@+id/nav_share"
+            android:icon="@drawable/ic_menu_share"
+            android:title="Share" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/logo_logout"
+            android:title="Logout" />
+
+    </group>
+
+</menu>

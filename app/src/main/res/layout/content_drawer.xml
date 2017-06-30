@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.anuda.garbage.Dashboard"
+    tools:showIn="@layout/content_drawer">
+    <RelativeLayout
+        android:id="@+id/pieChart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+
+
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/chart1"
+            android:layout_width="match_parent"
+            android:layout_height="280dp"
+            android:layout_alignParentStart="true"
+
+            android:layout_above="@+id/RecentTransaction"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:id="@+id/typeLabel"
+            android:layout_width="155dp"
+            android:layout_height="85dp"
+            android:layout_marginStart="17dp"
+            android:background="@color/materialShadow"
+            android:elevation="3dp"
+            android:text="Waste Type:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Notification.Title"
+            android:textColor="@color/oil"
+            android:textSize="20sp"
+            android:typeface="normal"
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="297dp"
+            android:textAlignment="center"
+            android:layout_above="@+id/btnDispose"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="22dp" />
+
+
+
+        <Button
+            android:id="@+id/btnDispose"
+            android:layout_width="307dp"
+            android:layout_height="67dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="15dp"
+            android:background="@color/primary"
+            android:elevation="8dp"
+            android:text="Dispose"
+            android:textSize="24sp"
+            tools:layout_editor_absoluteX="40dp"
+            tools:layout_editor_absoluteY="400dp" />
+
+        <TextView
+            android:id="@+id/dateLabel"
+            android:layout_width="155dp"
+            android:layout_height="85dp"
+            android:layout_marginEnd="15dp"
+            android:background="@color/materialShadow"
+            android:elevation="3dp"
+            android:text="Date:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Notification.Title"
+            android:textColor="@color/oil"
+            android:textSize="20sp"
+            android:textAlignment="center"
+            android:layout_alignBaseline="@+id/typeLabel"
+            android:layout_alignBottom="@+id/typeLabel"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:id="@+id/RecentTransaction"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:text="Last Transaction"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Notification.Title"
+            android:textSize="26sp"
+            android:layout_above="@+id/typeLabel"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="22dp" />
+    </RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>
