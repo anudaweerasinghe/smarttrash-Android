@@ -110,7 +110,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else if (id == R.id.nav_map) {
 
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_redeem) {
+            Intent intentNew = new Intent(MapsActivity.this, RedeemActivity.class);
+            startActivity(intentNew);
+        }else if (id == R.id.nav_share) {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT,"Download IdeaTrash Now!");
