@@ -62,6 +62,7 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
     final Context context= this;
     private GoogleMap Map;
     private FusedLocationProviderClient mFusedLocationClient;
+    private int numberOfRedemptions = 3;
 
 
 
@@ -174,18 +175,21 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
     }
 
     public void lastTransaction() {
-        if (WasteType == 0) {
-            typeLabel.setText("\nStart Recycling Now!");
-        } else if (WasteType == 1) {
-            typeLabel.setText("\nE-Waste");
-        } else if (WasteType == 2) {
-            typeLabel.setText("\nPaper");
-        } else if (WasteType == 3) {
-            typeLabel.setText("\nCardboard");
-        } else {
-            typeLabel.setText("\nStart Recycling Now!");
-        }
-        dateLabel.setText("\n"+date);
+//        if (WasteType == 0) {
+//            typeLabel.setText("\nStart Recycling Now!");
+//        } else if (WasteType == 1) {
+//            typeLabel.setText("\nE-Waste");
+//        } else if (WasteType == 2) {
+//            typeLabel.setText("\nPaper");
+//        } else if (WasteType == 3) {
+//            typeLabel.setText("\nCardboard");
+//        } else {
+//            typeLabel.setText("\nStart Recycling Now!");
+//        }
+
+        typeLabel.setText("Last Disposal\n\nUnion Place");
+
+        dateLabel.setText("Total Earnings\n\n"+50*numberOfRedemptions+"MB");
     }
 
     @Override
@@ -244,7 +248,6 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
         Map.addMarker(new MarkerOptions().position(bins[3]).title("Bin 4").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
         Map.addMarker(new MarkerOptions().position(bins[4]).title("Bin 5").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
         Map.addMarker(new MarkerOptions().position(bins[5]).title("Bin 6").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
-
 
     }
 
