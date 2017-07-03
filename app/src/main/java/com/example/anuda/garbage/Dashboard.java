@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.location.Location;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -27,13 +28,28 @@ import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.vision.text.Text;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class Dashboard extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener
+public class Dashboard extends AppCompatActivity implements View.OnClickListener,OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener
 //        ,
 //        DrawerLayout.DrawerListener
 {
@@ -43,10 +59,9 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
     TextView typeLabel;
     Button Dispose;
     TextView dateLabel;
-    private PieChart binGraph;
     final Context context= this;
-    private int data1=75;
-    private int data2= 100-data1;
+    private GoogleMap Map;
+    private FusedLocationProviderClient mFusedLocationClient;
 
 
 
@@ -62,33 +77,8 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Dispose.setOnClickListener(this);
-        binGraph = (PieChart) findViewById(R.id.chart1);
-        binGraph.setUsePercentValues(true);
-        binGraph.getDescription().setEnabled(false);
-        binGraph.setExtraOffsets(5, 10, 5, 5);
 
-        binGraph.setDragDecelerationFrictionCoef(0.95f);
 
-        binGraph.setDrawHoleEnabled(true);
-        binGraph.setHoleColor(Color.WHITE);
-
-        binGraph.setTransparentCircleColor(Color.WHITE);
-        binGraph.setTransparentCircleAlpha(110);
-
-        binGraph.setHoleRadius(58f);
-        binGraph.setTransparentCircleRadius(61f);
-
-        binGraph.setDrawCenterText(true);
-
-        binGraph.setRotationAngle(0);
-        binGraph.setRotationEnabled(false);
-        binGraph.setHighlightPerTapEnabled(false);
-        fillData();
-        binGraph.setCenterText(centerText());
-        toolbar.setTitle("Dashboard");
-        centerText();
-        Legend legend = binGraph.getLegend();
-        legend.setEnabled(false);
         lastTransaction();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_dashboard);
@@ -98,6 +88,11 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.dashmap);
+        mapFragment.getMapAsync(this);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
 
 
@@ -168,6 +163,7 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_dashboard);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+
     }
 
 
@@ -192,33 +188,64 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
         dateLabel.setText("\n"+date);
     }
 
-
-
-    public void fillData(){
-        List<PieEntry> entries=new ArrayList<>();
-        entries.add(new PieEntry(data1, ""));
-        entries.add(new PieEntry(data2, ""));
-
-        PieDataSet set= new PieDataSet(entries,"Colors");
-        PieData data =new PieData(set);
-        int colorCodeOne=Color.parseColor("#468500");
-        int colorCodeTwo=Color.parseColor("#F44336");
-        set.setColors(new int[]{colorCodeTwo, colorCodeOne});
-
-        binGraph.setData(data);
-        binGraph.invalidate();
-        data.setHighlightEnabled(false);
-        data.setDrawValues(false);
-
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        Map = googleMap;
+        getLastLocation();
+        setstyle();
 
     }
 
-    private SpannableString centerText(){
-        SpannableString s = new SpannableString(data1+"% \n FULL");
+    private void setstyle(){
+        MapStyleOptions style;
+        style =MapStyleOptions.loadRawResourceStyle(this,R.raw.mapstyledash);
+        Map.setMapStyle(style);
+
+    }
+
+    private void getLastLocation(){
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            setMarker(location);
 
 
+                        }else{
 
-        return s;
+                            LatLng Colombo = new LatLng(6, 80);
+                            Map.addMarker(new MarkerOptions().position(Colombo).title("Colombo"));
+                            Map.moveCamera(CameraUpdateFactory.newLatLng(Colombo));
+                        }
+                    }
+                });
+        
+    }
+
+    private void setMarker(Location loc){
+        LatLng location = new LatLng(loc.getLatitude(), loc.getLongitude());
+        Map.addMarker(new MarkerOptions().position(location).title("Current Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(location).zoom(17).bearing(0).tilt(0).build();
+        Map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//        Map.moveCamera(CameraUpdateFactory.zoomIn(newLatLng(location)).);
+
+        LatLng bins[]={new LatLng(7.177, 79.89)
+                ,new LatLng(6.1,80.478)
+                ,new LatLng(6.433,79.998)
+                ,new LatLng(6.292,80.164)
+                ,new LatLng(7.328,80.121)
+                ,new LatLng(8.029,79.833)};
+
+        Map.addMarker(new MarkerOptions().position(bins[0]).title("Bin 1").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
+        Map.addMarker(new MarkerOptions().position(bins[1]).title("Bin 2").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
+        Map.addMarker(new MarkerOptions().position(bins[2]).title("Bin 3").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
+        Map.addMarker(new MarkerOptions().position(bins[3]).title("Bin 4").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
+        Map.addMarker(new MarkerOptions().position(bins[4]).title("Bin 5").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
+        Map.addMarker(new MarkerOptions().position(bins[5]).title("Bin 6").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
+
+
     }
 
 

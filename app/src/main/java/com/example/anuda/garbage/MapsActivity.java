@@ -17,6 +17,7 @@ import android.view.View;
 
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -62,6 +63,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 getLastLocation();
             }
         });
+
 
     }
     @Override
