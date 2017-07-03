@@ -185,6 +185,9 @@ public class RedeemActivity extends AppCompatActivity implements NavigationView.
         } else if (id == R.id.nav_logout) {
             Intent intentNew = new Intent(RedeemActivity.this, LoginActivity.class);
             startActivity(intentNew);
+        }else if (id == R.id.nav_collector) {
+            Intent intentNew = new Intent(RedeemActivity.this,CollectorActivity.class);
+            startActivity(intentNew);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_redeem);

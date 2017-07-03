@@ -124,6 +124,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else if (id == R.id.nav_logout) {
             Intent intentNew = new Intent(MapsActivity.this, LoginActivity.class);
             startActivity(intentNew);
+        }else if (id == R.id.nav_collector) {
+            Intent intentNew = new Intent(MapsActivity.this,CollectorActivity.class);
+            startActivity(intentNew);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_maps);

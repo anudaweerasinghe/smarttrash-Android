@@ -159,6 +159,9 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
         } else if (id == R.id.nav_logout) {
             Intent intentNew = new Intent(Dashboard.this, LoginActivity.class);
             startActivity(intentNew);
+        }else if (id == R.id.nav_collector) {
+            Intent intentNew = new Intent(Dashboard.this,CollectorActivity.class);
+            startActivity(intentNew);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_dashboard);
