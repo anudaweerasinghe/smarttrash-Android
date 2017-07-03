@@ -221,7 +221,7 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
                         }
                     }
                 });
-        
+
     }
 
     private void setMarker(Location loc){
