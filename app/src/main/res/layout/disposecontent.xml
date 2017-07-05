@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/materialShadow">
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/disposemap"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            tools:context="com.example.anuda.garbage.Dashboard"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:id="@+id/disposeText"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:background="@color/white"
+            android:textColor="@color/black"
+            android:layout_height="120dp"
+            android:textSize="20sp"
+            android:elevation="5dp"
+            android:layout_below="@+id/disposemap"
+            android:layout_centerHorizontal="true"
+            android:layout_marginHorizontal="30dp"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/navigationFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="18dp"
+            android:clickable="true"
+            app:backgroundTint="@color/accent"
+            app:fabSize="normal"
+            app:srcCompat="@android:drawable/ic_menu_directions"
+            android:elevation="80dp"
+            android:layout_below="@+id/disposeText"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="14dp" />
+
+    </RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>

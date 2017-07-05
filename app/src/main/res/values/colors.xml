@@ -3,7 +3,7 @@
     <color name="primary">#4CAF50</color>
     <color name="primary_dark">#2E7D32</color>
     <color name="primary_darker">#1B5E20</color>
-    <color name="accent">#F50057</color>
+    <color name="accent">#f50057</color>
     <color name="materialShadow">#f1f8e9</color>
 
     <color name="black">#000000</color>

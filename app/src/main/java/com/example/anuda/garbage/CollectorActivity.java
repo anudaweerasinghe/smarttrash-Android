@@ -78,20 +78,7 @@ public class CollectorActivity extends AppCompatActivity implements View.OnClick
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -108,7 +95,8 @@ public class CollectorActivity extends AppCompatActivity implements View.OnClick
             startActivity(intentNew);
 
         } else if (id == R.id.nav_redeem) {
-
+            Intent intentNew = new Intent(CollectorActivity.this,RedeemActivity.class);
+            startActivity(intentNew);
         }else if (id == R.id.nav_share) {
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
@@ -119,8 +107,7 @@ public class CollectorActivity extends AppCompatActivity implements View.OnClick
             Intent intentNew = new Intent(CollectorActivity.this, LoginActivity.class);
             startActivity(intentNew);
         }else if (id == R.id.nav_collector) {
-            Intent intentNew = new Intent(CollectorActivity.this,CollectorActivity.class);
-            startActivity(intentNew);
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_collector);

@@ -8,7 +8,7 @@
     tools:context="com.example.anuda.garbage.Dashboard"
     tools:showIn="@layout/content_drawer">
     <RelativeLayout
-        android:id="@+id/pieChart"
+        android:id="@+id/dashboard"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white">
@@ -19,11 +19,10 @@
             android:id="@+id/dashmap"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="280dp"
+            android:layout_height="300dp"
             tools:context="com.example.anuda.garbage.Dashboard"
             android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:layout_above="@+id/RecentTransaction"/>
+            android:layout_alignParentStart="true" />
 
 
         <TextView
@@ -33,7 +32,6 @@
             android:layout_marginStart="17dp"
             android:background="@color/materialShadow"
             android:elevation="3dp"
-            android:text="Waste Type:"
             android:textAppearance="@style/TextAppearance.AppCompat.Notification.Title"
             android:textColor="@color/oil"
             android:textSize="20sp"
@@ -68,7 +66,6 @@
             android:layout_marginEnd="15dp"
             android:background="@color/materialShadow"
             android:elevation="3dp"
-            android:text="Date:"
             android:textAppearance="@style/TextAppearance.AppCompat.Notification.Title"
             android:textColor="@color/oil"
             android:textSize="20sp"
@@ -77,17 +74,6 @@
             android:layout_alignBottom="@+id/typeLabel"
             android:layout_alignParentEnd="true" />
 
-        <TextView
-            android:id="@+id/RecentTransaction"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:text="Last Transaction"
-            android:textAlignment="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Notification.Title"
-            android:textSize="26sp"
-            android:layout_above="@+id/typeLabel"
-            android:layout_alignParentStart="true"
-            android:layout_marginBottom="22dp" />
     </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

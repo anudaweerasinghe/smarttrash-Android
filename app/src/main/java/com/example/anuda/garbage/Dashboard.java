@@ -23,11 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.text.SpannableString;
 
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -54,7 +50,6 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
 //        DrawerLayout.DrawerListener
 {
 
-    int WasteType=0;
     String date="26.06.2017";
     TextView typeLabel;
     Button Dispose;
@@ -116,20 +111,7 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -173,8 +155,8 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
 
     @Override
     public void onClick(View v){
-        WasteType++;
-        lastTransaction();
+        Intent intentNew = new Intent(Dashboard.this, DisposeActivity.class);
+        startActivity(intentNew);
     }
 
     public void lastTransaction() {
