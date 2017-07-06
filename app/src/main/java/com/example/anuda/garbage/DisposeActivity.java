@@ -222,6 +222,7 @@ public class DisposeActivity extends AppCompatActivity implements OnMapReadyCall
 
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(DisposeActivity.this)
+                .setTitle("Location Services")
                 .setMessage(message)
                 .setPositiveButton("OK", okListener)
                 .setNegativeButton("Cancel", null)

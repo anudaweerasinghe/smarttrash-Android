@@ -200,6 +200,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(MapsActivity.this)
+                .setTitle("Location Services")
                 .setMessage(message)
                 .setPositiveButton("OK", okListener)
                 .setNegativeButton("Cancel", null)

@@ -236,6 +236,7 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
 
     private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(Dashboard.this)
+                .setTitle("Location Services")
                 .setMessage(message)
                 .setPositiveButton("OK", okListener)
                 .setNegativeButton("Cancel", null)
