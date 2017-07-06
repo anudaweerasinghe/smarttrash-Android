@@ -1,6 +1,8 @@
 package com.example.anuda.garbage;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentActivity;
@@ -9,6 +11,7 @@ import android.location.Location;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -158,9 +161,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         }else{
 
-                            LatLng Colombo = new LatLng(6, 80);
-                            mMap.addMarker(new MarkerOptions().position(Colombo).title("Colombo"));
-                            mMap.moveCamera(CameraUpdateFactory.newLatLng(Colombo));
+                            showMessageOKCancel("To see Nearby Bins, turn on Location Services",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent onGPS = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                            startActivity(onGPS);
+                                        }
+                                    });
                         }
                     }
                 });
@@ -189,4 +197,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
 }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(MapsActivity.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
 }

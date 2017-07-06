@@ -2,15 +2,18 @@ package com.example.anuda.garbage;
 
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -110,9 +113,14 @@ public class DisposeActivity extends AppCompatActivity implements OnMapReadyCall
 
                         } else {
 
-                            LatLng Colombo = new LatLng(6, 80);
-                            disposeMap.addMarker(new MarkerOptions().position(Colombo).title("Colombo"));
-                            disposeMap.moveCamera(CameraUpdateFactory.newLatLng(Colombo));
+                            showMessageOKCancel("To see Nearby Bins, turn on Location Services",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent onGPS = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                            startActivity(onGPS);
+                                        }
+                                    });
                         }
                     }
                 });
@@ -212,7 +220,14 @@ public class DisposeActivity extends AppCompatActivity implements OnMapReadyCall
         return true;
     }
 
-
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(DisposeActivity.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
 
 
 }

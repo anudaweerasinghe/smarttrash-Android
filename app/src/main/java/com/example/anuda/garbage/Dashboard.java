@@ -1,14 +1,17 @@
 package com.example.anuda.garbage;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Location;
+import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.ShareActionProvider;
@@ -37,6 +40,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.nearby.messages.Message;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.vision.text.Text;
 
@@ -160,18 +164,6 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
     }
 
     public void lastTransaction() {
-//        if (WasteType == 0) {
-//            typeLabel.setText("\nStart Recycling Now!");
-//        } else if (WasteType == 1) {
-//            typeLabel.setText("\nE-Waste");
-//        } else if (WasteType == 2) {
-//            typeLabel.setText("\nPaper");
-//        } else if (WasteType == 3) {
-//            typeLabel.setText("\nCardboard");
-//        } else {
-//            typeLabel.setText("\nStart Recycling Now!");
-//        }
-
         typeLabel.setText("Last Disposal\n\nUnion Place");
 
         dateLabel.setText("Total Earnings\n\n"+50*numberOfRedemptions+"MB");
@@ -204,9 +196,15 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
 
                         }else{
 
-                            LatLng Colombo = new LatLng(6, 80);
-                            Map.addMarker(new MarkerOptions().position(Colombo).title("Colombo"));
-                            Map.moveCamera(CameraUpdateFactory.newLatLng(Colombo));
+                            showMessageOKCancel("To see Nearby Bins, turn on Location Services",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent onGPS = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                            startActivity(onGPS);
+                                        }
+                                    });
+//
                         }
                     }
                 });
@@ -216,7 +214,7 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
     private void setMarker(Location loc){
         LatLng location = new LatLng(loc.getLatitude(), loc.getLongitude());
         Map.addMarker(new MarkerOptions().position(location).title("Current Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(location).zoom(17).bearing(0).tilt(0).build();
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(location).zoom(15).bearing(0).tilt(0).build();
         Map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 //        Map.moveCamera(CameraUpdateFactory.zoomIn(newLatLng(location)).);
 
@@ -234,6 +232,15 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
         Map.addMarker(new MarkerOptions().position(bins[4]).title("Bin 5").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
         Map.addMarker(new MarkerOptions().position(bins[5]).title("Bin 6").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
 
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(Dashboard.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
     }
 
 
