@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black">
+    android:background="@color/oil">
 
     <RelativeLayout
         android:layout_width="368dp" android:layout_height="551dp"
@@ -14,8 +14,8 @@
 
         <SurfaceView
             android:id="@+id/camera_view"
-            android:layout_width="500px"
-            android:layout_height="500px"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"/>
 

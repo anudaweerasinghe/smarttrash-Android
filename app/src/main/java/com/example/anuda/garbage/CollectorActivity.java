@@ -44,7 +44,7 @@ public class CollectorActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public void onClick(View v){
-        String url = "http://www.forms.google.com";
+        String url = "https://goo.gl/j3SmKL";
         try {
             Intent i = new Intent("android.intent.action.MAIN");
             i.setComponent(ComponentName.unflattenFromString("com.android.chrome/com.android.chrome.Main"));
