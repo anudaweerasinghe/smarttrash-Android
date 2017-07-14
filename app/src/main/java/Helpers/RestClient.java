@@ -9,7 +9,7 @@ import retrofit2.Retrofit;
 public class RestClient {
 
    static Retrofit RequestObject = new Retrofit.Builder()
-            .baseUrl("http://localhost:8080/")
+            .baseUrl("http://188.166.230.183/IdeaTrash")
             .build();
 
     static public  GarbageBinService  garbageBinService= RequestObject.create(GarbageBinService.class);

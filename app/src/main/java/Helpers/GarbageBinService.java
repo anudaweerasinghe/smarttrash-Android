@@ -1,9 +1,14 @@
 package Helpers;
 
+import java.util.List;
+
+import models.api_models.NearestBinRequest;
+import models.app_models.Bins;
 import models.app_models.NearestBin;
 import models.api_models.SignUp;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
@@ -20,6 +25,11 @@ public interface GarbageBinService {
     Call<Void> logIn(@Query("phone") String phone,@Query("password") String password);
 
     @POST("garbageapi/nearest-bin")
-    Call<NearestBin>nearestBin(@Body NearestBin nearestBin);
+    Call<NearestBin>nearestBinRequest(@Body NearestBinRequest nearestBinRequest);
+
+    @GET("garbageapi/all-bins")
+    Call<List<Bins>>bins();
+
+
 
 }

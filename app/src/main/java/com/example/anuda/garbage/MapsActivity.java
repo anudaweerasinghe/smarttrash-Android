@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -32,6 +33,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.util.List;
+
+import Helpers.RestClient;
+import models.app_models.Bins;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
@@ -181,19 +190,36 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 //        mMap.moveCamera(CameraUpdateFactory.zoomIn(newLatLng(location)).);
 
-        LatLng bins[]={new LatLng(7.177, 79.89)
-                ,new LatLng(6.1,80.478)
-                ,new LatLng(6.433,79.998)
-                ,new LatLng(6.292,80.164)
-                ,new LatLng(7.328,80.121)
-                ,new LatLng(8.029,79.833)};
+        final Bins bins = new Bins();
 
-        mMap.addMarker(new MarkerOptions().position(bins[0]).title("Bin 1").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
-        mMap.addMarker(new MarkerOptions().position(bins[1]).title("Bin 2").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
-        mMap.addMarker(new MarkerOptions().position(bins[2]).title("Bin 3").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
-        mMap.addMarker(new MarkerOptions().position(bins[3]).title("Bin 4").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
-        mMap.addMarker(new MarkerOptions().position(bins[4]).title("Bin 5").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
-        mMap.addMarker(new MarkerOptions().position(bins[5]).title("Bin 6").icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
+        Call<List<Bins>> BinsCall = RestClient.garbageBinService.bins();
+
+        BinsCall.enqueue(new Callback<List<Bins>>() {
+            @Override
+            public void onResponse(Call<List<Bins>> call, Response<List<Bins>> response) {
+
+
+                for (int i = 0; i <response.body().size() ; i++) {
+
+                    double lng = response.body().get(i).getLng();
+                    double lat = response.body().get(i).getLat();
+                    String name = response.body().get(i).getName();
+                    String info = response.body().get(i).getInfo();
+                    LatLng binLocations = new LatLng(lat,lng);
+
+                    mMap.addMarker(new MarkerOptions().position(binLocations).title(name).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)).snippet(info));
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<List<Bins>> call, Throwable t) {
+                Toast.makeText(getBaseContext(), "There are currently no Active Bins.", Toast.LENGTH_LONG).show();
+            }
+        });
+
+
 
 
 }

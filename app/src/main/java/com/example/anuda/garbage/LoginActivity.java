@@ -2,6 +2,7 @@ package com.example.anuda.garbage;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.http.HttpResponseCache;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -29,6 +30,7 @@ import butterknife.Bind;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.http.HTTP;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
@@ -93,7 +95,12 @@ public class LoginActivity extends AppCompatActivity {
         logInCall.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                onLoginSuccess();
+                if(response.code()==200){
+                    onLoginSuccess();
+                }else {
+                    onLoginFailed();
+                }
+
             }
 
             @Override

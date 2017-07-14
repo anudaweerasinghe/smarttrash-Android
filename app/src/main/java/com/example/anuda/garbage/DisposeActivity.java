@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -40,14 +41,23 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import Helpers.RestClient;
+import models.api_models.NearestBinRequest;
+import models.app_models.NearestBin;
+import models.app_models.NearestBinBin;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class DisposeActivity extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener {
 
     private GoogleMap disposeMap;
     TextView disposeText;
     private FusedLocationProviderClient mFusedLocationClient;
-    String nearestBin= "Dialog Iconic Center at Union Place";
-    double nearestBinLocationLat = 6.9183201;
-    double nearestBinLocationLng= 79.8626769;
+    String nearestBin;
+    double nearestBinLocationLat;
+    double nearestBinLocationLng;
+    double distanceToNearest;
     FloatingActionButton navigationFab;
 
 
@@ -63,7 +73,7 @@ public class DisposeActivity extends AppCompatActivity implements OnMapReadyCall
         mapFragment.getMapAsync(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        setNearestBin();
+
 
         navigationFab = (FloatingActionButton)findViewById(R.id.navigationFab);
         navigationFab.setOnClickListener(new View.OnClickListener() {
@@ -109,6 +119,7 @@ public class DisposeActivity extends AppCompatActivity implements OnMapReadyCall
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                             setMarker(location);
+                            setNearestBin(location);
 
 
                         } else {
@@ -143,9 +154,35 @@ public class DisposeActivity extends AppCompatActivity implements OnMapReadyCall
 
     }
 
-    private void setNearestBin(){
+    private void setNearestBin(Location loc){
 
-        disposeText.setText("The Nearest Bin is At \n\n"+nearestBin);
+        NearestBinRequest nearestBinRequest = new NearestBinRequest();
+
+        nearestBinRequest.setCurrentLocationLat(loc.getLatitude());
+        nearestBinRequest.setCurrentLocationLng(loc.getLongitude());
+
+        Call<NearestBin> nearestBinRequestCall = RestClient.garbageBinService.nearestBinRequest(nearestBinRequest);
+
+        nearestBinRequestCall.enqueue(new Callback<NearestBin>() {
+
+            @Override
+            public void onResponse(Call<NearestBin> call, Response<NearestBin> response) {
+
+                nearestBinLocationLat = response.body().getBin().getLat();
+                nearestBinLocationLng = response.body().getBin().getLng();
+                distanceToNearest =  response.body().getDistance()/1000;
+
+                nearestBin=response.body().getBin().getName();
+
+            }
+
+            @Override
+            public void onFailure(Call<NearestBin> call, Throwable t) {
+                Toast.makeText(getBaseContext(), "No Nearby Bins", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        disposeText.setText("The Nearest Bin is At \n"+nearestBin+"\n"+distanceToNearest+"\nkm away from current location.");
     }
 
     private void navigationButton(){
