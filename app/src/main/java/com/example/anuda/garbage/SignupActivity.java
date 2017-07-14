@@ -11,31 +11,22 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import Helpers.RestClient;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import butterknife.ButterKnife;
-import butterknife.Bind;
+import models.api_models.SignUp;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SignupActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";
 
     @Bind(R.id.input_name)
     EditText _nameText;
-    @Bind(R.id.input_address) EditText _addressText;
-    @Bind(R.id.input_email) EditText _emailText;
     @Bind(R.id.input_mobile) EditText _mobileText;
+    @Bind(R.id.input_address) EditText _addressText;
     @Bind(R.id.input_password) EditText _passwordText;
     @Bind(R.id.input_reEnterPassword) EditText _reEnterPasswordText;
     @Bind(R.id.btn_signup)
@@ -72,8 +63,8 @@ public class SignupActivity extends AppCompatActivity {
         Log.d(TAG, "Signup");
 
         if (!validate()) {
-            onSignupFailed();
-            Intent intentNew = new Intent(SignupActivity.this, Dashboard.class);
+
+
             return;
         }
 
@@ -87,12 +78,37 @@ public class SignupActivity extends AppCompatActivity {
 
         String name = _nameText.getText().toString();
         String address = _addressText.getText().toString();
-        String email = _emailText.getText().toString();
         String mobile = _mobileText.getText().toString();
         String password = _passwordText.getText().toString();
         String reEnterPassword = _reEnterPasswordText.getText().toString();
 
-        // TODO: Implement your own signup logic here.
+
+        SignUp signUp = new SignUp();
+
+        signUp.setName(name);
+        signUp.setAddress(address);
+        signUp.setPhone(mobile);
+        signUp.setPassword(password);
+
+       Call<SignUp> signUpCall= RestClient.garbageBinService.signUp(signUp);
+
+
+        signUpCall.enqueue(new Callback<SignUp>() {
+            @Override
+            public void onResponse(Call<SignUp> call, Response<SignUp> response) {
+                // The network call was a success and we got a response
+                Intent intentNew = new Intent(SignupActivity.this, Dashboard.class);
+                startActivity(intentNew);
+            }
+
+            @Override
+            public void onFailure(Call<SignUp> call, Throwable t) {
+                // the network call was a failure
+                onSignupFailed();
+            }
+        });
+
+
 
         new android.os.Handler().postDelayed(
                 new Runnable() {
@@ -114,7 +130,7 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     public void onSignupFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "Signup failed", Toast.LENGTH_LONG).show();
 
         _signupButton.setEnabled(true);
     }
@@ -124,7 +140,6 @@ public class SignupActivity extends AppCompatActivity {
 
         String name = _nameText.getText().toString();
         String address = _addressText.getText().toString();
-        String email = _emailText.getText().toString();
         String mobile = _mobileText.getText().toString();
         String password = _passwordText.getText().toString();
         String reEnterPassword = _reEnterPasswordText.getText().toString();
@@ -144,14 +159,7 @@ public class SignupActivity extends AppCompatActivity {
         }
 
 
-        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _emailText.setError("enter a valid email address");
-            valid = false;
-        } else {
-            _emailText.setError(null);
-        }
-
-        if (mobile.isEmpty() || mobile.length()!=10) {
+        if (mobile.isEmpty() || mobile.length()!=9) {
             _mobileText.setError("Enter Valid Mobile Number");
             valid = false;
         } else {
