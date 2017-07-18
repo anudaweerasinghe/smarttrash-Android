@@ -3,6 +3,7 @@ package com.example.anuda.garbage;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Location;
@@ -60,16 +61,16 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
 //        DrawerLayout.DrawerListener
 {
 
-    String date="26.06.2017";
     TextView typeLabel;
     Button Dispose;
     TextView dateLabel;
+    TextView navNameLabel;
+    TextView navPhoneLabel;
     final Context context= this;
     private GoogleMap Map;
     private FusedLocationProviderClient mFusedLocationClient;
-    private int numberOfRedemptions = 3;
-
-
+    private int numberOfRedemptions= 3;
+//    SharedPreferences.Editor editor;
 
 
 
@@ -80,10 +81,11 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
         typeLabel = (TextView) findViewById(R.id.typeLabel);
         Dispose = (Button) findViewById(R.id.btnDispose);
         dateLabel = (TextView) findViewById(R.id.dateLabel);
+        navNameLabel = (TextView) findViewById(R.id.nav_name_text);
+        navPhoneLabel = (TextView) findViewById(R.id.nav_name_text);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Dispose.setOnClickListener(this);
-
 
         lastTransaction();
 
@@ -100,8 +102,12 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
         mapFragment.getMapAsync(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+//        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
+//        editor = pref.edit();
+//        numberOfRedemptions = pref.getInt("Redemptions",0);
 
-
+//        navNameLabel.setText(pref.getString("Name",null));
+//        navPhoneLabel.setText(pref.getString("Mobile",null));
     }
 
     @Override
@@ -149,6 +155,8 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
             startActivity(sendIntent);
 
         } else if (id == R.id.nav_logout) {
+//            editor.clear();
+//            editor.commit();
             Intent intentNew = new Intent(Dashboard.this, LoginActivity.class);
             startActivity(intentNew);
         }else if (id == R.id.nav_collector) {
@@ -241,7 +249,7 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
                     String info = response.body().get(i).getInfo();
                     LatLng binLocations = new LatLng(lat,lng);
 
-                    Map.addMarker(new MarkerOptions().position(binLocations).title(name).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)).snippet(info));
+                    Map.addMarker(new MarkerOptions().position(binLocations).title(name).icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)).snippet(info));
 
                 }
 

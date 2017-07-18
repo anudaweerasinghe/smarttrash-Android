@@ -56,16 +56,16 @@
             android:name=".MapsActivity"
             android:label="@string/Nearby"
             android:theme="@style/AppTheme.Dark" />
-        <activity android:name=".Dashboard">
+        <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity" />
+        <activity android:name=".DisposeActivity" />
         <activity android:name=".CollectorActivity" />
-        <activity android:name=".DisposeActivity"></activity>
+        <activity android:name=".Dashboard"></activity>
     </application>
 
 </manifest>

@@ -18,16 +18,16 @@ import retrofit2.http.Query;
 
 public interface GarbageBinService {
 
-    @POST("garbageapi/new-user")
+    @POST("new-user")
     Call<SignUp> signUp(@Body SignUp signUp);
 
-    @POST("garbageapi/verify")
+    @POST("verify")
     Call<Void> logIn(@Query("phone") String phone,@Query("password") String password);
 
-    @POST("garbageapi/nearest-bin")
+    @POST("nearest-bin")
     Call<NearestBin>nearestBinRequest(@Body NearestBinRequest nearestBinRequest);
 
-    @GET("garbageapi/all-bins")
+    @GET("all-bins")
     Call<List<Bins>>bins();
 
 

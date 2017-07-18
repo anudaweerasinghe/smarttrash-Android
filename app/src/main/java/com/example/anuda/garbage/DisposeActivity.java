@@ -4,6 +4,8 @@ import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.net.Uri;
 import android.provider.Settings;
@@ -59,12 +61,18 @@ public class DisposeActivity extends AppCompatActivity implements OnMapReadyCall
     double nearestBinLocationLng;
     double distanceToNearest;
     FloatingActionButton navigationFab;
+//    Editor editor;
+    TextView navNameLabel;
+    TextView navPhoneLabel;
+    private String nearestBinInfo;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dispose);
+        navNameLabel = (TextView) findViewById(R.id.nav_name_text);
+        navPhoneLabel = (TextView) findViewById(R.id.nav_name_text);
 
         disposeText = (TextView) findViewById(R.id.disposeText);
 
@@ -93,6 +101,12 @@ public class DisposeActivity extends AppCompatActivity implements OnMapReadyCall
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+//        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
+//        editor = pref.edit();
+//
+//        navNameLabel.setText(pref.getString("Name",null));
+//        navPhoneLabel.setText(pref.getString("Mobile",null));
     }
 
     @Override
@@ -111,6 +125,8 @@ public class DisposeActivity extends AppCompatActivity implements OnMapReadyCall
 
     }
 
+    Location currentLoc;
+
     private void getLastLocation() {
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -118,8 +134,8 @@ public class DisposeActivity extends AppCompatActivity implements OnMapReadyCall
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
-                            setMarker(location);
                             setNearestBin(location);
+                            currentLoc=location;
 
 
                         } else {
@@ -146,7 +162,7 @@ public class DisposeActivity extends AppCompatActivity implements OnMapReadyCall
 
         LatLng nearestBinLatLng = new LatLng(nearestBinLocationLat,nearestBinLocationLng);
 
-        disposeMap.addMarker(new MarkerOptions().position(nearestBinLatLng).title(nearestBin).icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)));
+        disposeMap.addMarker(new MarkerOptions().position(nearestBinLatLng).title(nearestBin).icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)).snippet(nearestBinInfo));
 
 
 //        Map.moveCamera(CameraUpdateFactory.zoomIn(newLatLng(location)).);
@@ -174,6 +190,11 @@ public class DisposeActivity extends AppCompatActivity implements OnMapReadyCall
 
                 nearestBin=response.body().getBin().getName();
 
+                nearestBinInfo=response.body().getBin().getInfo();
+
+                setMarker(currentLoc);
+                disposeText.setText("The Nearest Bin is at "+nearestBin+"\n"+distanceToNearest+"km away from current location.");
+
             }
 
             @Override
@@ -182,7 +203,7 @@ public class DisposeActivity extends AppCompatActivity implements OnMapReadyCall
             }
         });
 
-        disposeText.setText("The Nearest Bin is At \n"+nearestBin+"\n"+distanceToNearest+"\nkm away from current location.");
+
     }
 
     private void navigationButton(){
@@ -245,6 +266,8 @@ public class DisposeActivity extends AppCompatActivity implements OnMapReadyCall
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
         } else if (id == R.id.nav_logout) {
+//            editor.clear();
+//            editor.commit();
             Intent intentNew = new Intent(DisposeActivity.this, LoginActivity.class);
             startActivity(intentNew);
         }else if (id == R.id.nav_collector) {

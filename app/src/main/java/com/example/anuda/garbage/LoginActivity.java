@@ -2,6 +2,7 @@ package com.example.anuda.garbage;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.http.HttpResponseCache;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.SharedPreferences.Editor;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -43,6 +45,9 @@ public class LoginActivity extends AppCompatActivity {
     Button _loginButton;
     @Bind(R.id.link_signup)
     TextView _signupLink;
+//    Editor editor;
+    private String mobile;
+    private String password;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,6 +74,16 @@ public class LoginActivity extends AppCompatActivity {
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
             }
         });
+
+//        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
+//        editor = pref.edit();
+
+
+//        if (pref.getBoolean("LogIn status",true)){
+//            Intent intentNew = new Intent(LoginActivity.this, Dashboard.class);
+//            startActivity(intentNew);
+//        }else{
+//        }
     }
 
     public void login() {
@@ -87,8 +102,11 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog.setMessage("Authenticating...");
         progressDialog.show();
 
-        String mobile = _mobileText.getText().toString();
-        String password = _passwordText.getText().toString();
+        mobile = _mobileText.getText().toString();
+        password = _passwordText.getText().toString();
+
+
+
 
         Call<Void> logInCall = RestClient.garbageBinService.logIn(mobile,password);
 
@@ -123,17 +141,17 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_SIGNUP) {
-            if (resultCode == RESULT_OK) {
-
-                // TODO: Implement successful signup logic here
-                // By default we just finish the Activity and log them in automatically
-                this.finish();
-            }
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == REQUEST_SIGNUP) {
+//            if (resultCode == RESULT_OK) {
+//
+//                // TODO: Implement successful signup logic here
+//                // By default we just finish the Activity and log them in automatically
+//                this.finish();
+//            }
+//        }
+//    }
 
     @Override
     public void onBackPressed() {
@@ -143,6 +161,11 @@ public class LoginActivity extends AppCompatActivity {
 
     public void onLoginSuccess() {
         _loginButton.setEnabled(true);
+//        editor.clear();
+//        editor.putString("Mobile",mobile);
+//        editor.putString("Password",password);
+//        editor.putBoolean("LogIn Status",true);
+//        editor.commit();
         Intent intentNew = new Intent(LoginActivity.this, Dashboard.class);
         startActivity(intentNew);
         finish();

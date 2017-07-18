@@ -2,6 +2,8 @@ package com.example.anuda.garbage;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -33,6 +35,8 @@ public class SignupActivity extends AppCompatActivity {
     Button _signupButton;
     @Bind(R.id.link_login)
     TextView _loginLink;
+    Editor editor;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,13 +61,15 @@ public class SignupActivity extends AppCompatActivity {
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
             }
         });
+
+//        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
+//        editor = pref.edit();
     }
 
     public void signup() {
         Log.d(TAG, "Signup");
 
         if (!validate()) {
-
 
             return;
         }
@@ -82,6 +88,11 @@ public class SignupActivity extends AppCompatActivity {
         String password = _passwordText.getText().toString();
         String reEnterPassword = _reEnterPasswordText.getText().toString();
 
+//        editor.putString("Mobile",mobile);
+//        editor.putString("Name",name);
+//        editor.putString("Password",password);
+//        editor.putBoolean("LogIn status",true);
+//        editor.commit();
 
         SignUp signUp = new SignUp();
 
@@ -90,6 +101,8 @@ public class SignupActivity extends AppCompatActivity {
         signUp.setPhone(mobile);
         signUp.setPassword(password);
 
+
+
        Call<SignUp> signUpCall= RestClient.garbageBinService.signUp(signUp);
 
 
@@ -97,8 +110,11 @@ public class SignupActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<SignUp> call, Response<SignUp> response) {
                 // The network call was a success and we got a response
-                Intent intentNew = new Intent(SignupActivity.this, Dashboard.class);
-                startActivity(intentNew);
+                if(response.code()==200){
+                    onSignupSuccess();
+                }else{
+                    onSignupFailed();
+                }
             }
 
             @Override
@@ -126,6 +142,8 @@ public class SignupActivity extends AppCompatActivity {
     public void onSignupSuccess() {
         _signupButton.setEnabled(true);
         setResult(RESULT_OK, null);
+        Intent intentNew = new Intent(SignupActivity.this, Dashboard.class);
+        startActivity(intentNew);
         finish();
     }
 

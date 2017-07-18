@@ -2,6 +2,8 @@ package com.example.anuda.garbage;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -17,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -46,6 +49,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationClient;
+//    Editor editor;
+    TextView navNameLabel;
+    TextView navPhoneLabel;
 
 
     @Override
@@ -59,6 +65,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         Toolbar toolbarmaps = (Toolbar) findViewById(R.id.toolbarmaps);
         setSupportActionBar(toolbarmaps);
+        navNameLabel = (TextView) findViewById(R.id.nav_name_text);
+        navPhoneLabel = (TextView) findViewById(R.id.nav_name_text);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_maps);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -75,6 +83,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 getLastLocation();
             }
         });
+
+//        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
+//        editor = pref.edit();
+//
+//        navNameLabel.setText(pref.getString("Name",null));
+//        navPhoneLabel.setText(pref.getString("Mobile",null));
 
 
     }
@@ -122,6 +136,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
         } else if (id == R.id.nav_logout) {
+//            editor.clear();
+//            editor.commit();
             Intent intentNew = new Intent(MapsActivity.this, LoginActivity.class);
             startActivity(intentNew);
         }else if (id == R.id.nav_collector) {
@@ -207,7 +223,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     String info = response.body().get(i).getInfo();
                     LatLng binLocations = new LatLng(lat,lng);
 
-                    mMap.addMarker(new MarkerOptions().position(binLocations).title(name).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)).snippet(info));
+                    mMap.addMarker(new MarkerOptions().position(binLocations).title(name).icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)).snippet(info));
 
                 }
 

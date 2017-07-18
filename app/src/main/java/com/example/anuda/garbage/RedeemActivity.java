@@ -3,6 +3,8 @@ package com.example.anuda.garbage;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.hardware.Camera;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -39,6 +41,9 @@ public class RedeemActivity extends AppCompatActivity implements NavigationView.
     TextView barcodeInfo;
     BarcodeDetector barcodeDetector;
     CameraSource cameraSource;
+//    Editor editor;
+    TextView navNameLabel;
+    TextView navPhoneLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +53,9 @@ public class RedeemActivity extends AppCompatActivity implements NavigationView.
         Toolbar toolbarredeem = (Toolbar) findViewById(R.id.toolbarredeem);
         setSupportActionBar(toolbarredeem);
 
+        navNameLabel = (TextView) findViewById(R.id.nav_name_text);
+        navPhoneLabel = (TextView) findViewById(R.id.nav_name_text);
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_redeem);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbarredeem, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -55,6 +63,12 @@ public class RedeemActivity extends AppCompatActivity implements NavigationView.
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+//        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
+//        editor = pref.edit();
+
+//        navNameLabel.setText(pref.getString("Name",null));
+//        navPhoneLabel.setText(pref.getString("Mobile",null));
 
         cameraView = (SurfaceView)findViewById(R.id.camera_view);
         barcodeInfo = (TextView)findViewById(R.id.code_info);
@@ -118,6 +132,7 @@ public class RedeemActivity extends AppCompatActivity implements NavigationView.
                                     Intent intentNew = new Intent(RedeemActivity.this, Dashboard.class);
                                     startActivity(intentNew);
                                     RedeemActivity.this.finish();
+//                                    editor.putInt("Redemptions",1);
 //                                    progressDialog.dismiss();
 
                                 }
@@ -170,6 +185,8 @@ public class RedeemActivity extends AppCompatActivity implements NavigationView.
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
         } else if (id == R.id.nav_logout) {
+//            editor.clear();
+//            editor.commit();
             Intent intentNew = new Intent(RedeemActivity.this, LoginActivity.class);
             startActivity(intentNew);
         }else if (id == R.id.nav_collector) {

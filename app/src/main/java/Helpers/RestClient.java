@@ -1,6 +1,7 @@
 package Helpers;
 
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Anuda on 7/14/17.
@@ -9,7 +10,8 @@ import retrofit2.Retrofit;
 public class RestClient {
 
    static Retrofit RequestObject = new Retrofit.Builder()
-            .baseUrl("http://188.166.230.183/IdeaTrash")
+            .baseUrl("http://128.199.229.198:8080/garbageback/garbageapi/")
+            .addConverterFactory(GsonConverterFactory.create())
             .build();
 
     static public  GarbageBinService  garbageBinService= RequestObject.create(GarbageBinService.class);
