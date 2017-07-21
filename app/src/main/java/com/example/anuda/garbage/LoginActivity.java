@@ -3,6 +3,7 @@ package com.example.anuda.garbage;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.http.HttpResponseCache;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.content.SharedPreferences.Editor;
+
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -45,15 +46,16 @@ public class LoginActivity extends AppCompatActivity {
     Button _loginButton;
     @Bind(R.id.link_signup)
     TextView _signupLink;
-//    Editor editor;
     private String mobile;
     private String password;
+    Editor editor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+
 
         _loginButton.setOnClickListener(new View.OnClickListener() {
 
@@ -75,15 +77,16 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-//        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
-//        editor = pref.edit();
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", MODE_PRIVATE); // 0 - for private mode
+        editor = pref.edit();
 
+        if(pref.getBoolean("LogIn Status",false)){
+            Intent intentNew = new Intent(LoginActivity.this, Dashboard.class);
+            startActivity(intentNew);
+        }else {
 
-//        if (pref.getBoolean("LogIn status",true)){
-//            Intent intentNew = new Intent(LoginActivity.this, Dashboard.class);
-//            startActivity(intentNew);
-//        }else{
-//        }
+        }
+
     }
 
     public void login() {
@@ -102,8 +105,6 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog.setMessage("Authenticating...");
         progressDialog.show();
 
-        mobile = _mobileText.getText().toString();
-        password = _passwordText.getText().toString();
 
 
 
@@ -113,10 +114,10 @@ public class LoginActivity extends AppCompatActivity {
         logInCall.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if(response.code()==200){
-                    onLoginSuccess();
-                }else {
+                if(response.code()==401){
                     onLoginFailed();
+                }else {
+                    onLoginSuccess();
                 }
 
             }
@@ -133,7 +134,7 @@ public class LoginActivity extends AppCompatActivity {
                 new Runnable() {
                     public void run() {
                         // On complete call either onLoginSuccess or onLoginFailed
-                        onLoginSuccess();
+
                         // onLoginFailed();
                         progressDialog.dismiss();
                     }
@@ -161,14 +162,13 @@ public class LoginActivity extends AppCompatActivity {
 
     public void onLoginSuccess() {
         _loginButton.setEnabled(true);
-//        editor.clear();
-//        editor.putString("Mobile",mobile);
-//        editor.putString("Password",password);
-//        editor.putBoolean("LogIn Status",true);
-//        editor.commit();
+        editor.clear();
+        editor.putBoolean("LogIn Status",true);
+        editor.putString("Mobile",mobile);
+        editor. putString("Password", password);
+        editor.commit();
         Intent intentNew = new Intent(LoginActivity.this, Dashboard.class);
         startActivity(intentNew);
-        finish();
     }
 
     public void onLoginFailed() {
@@ -180,8 +180,8 @@ public class LoginActivity extends AppCompatActivity {
     public boolean validate() {
         boolean valid = true;
 
-        String mobile = _mobileText.getText().toString();
-        String password = _passwordText.getText().toString();
+         mobile = _mobileText.getText().toString();
+         password = _passwordText.getText().toString();
 
         if (mobile.isEmpty() || mobile.length()!=9) {
             _mobileText.setError("Enter Valid Mobile Number");

@@ -21,7 +21,7 @@ public interface GarbageBinService {
     @POST("new-user")
     Call<SignUp> signUp(@Body SignUp signUp);
 
-    @POST("verify")
+    @GET("verify")
     Call<Void> logIn(@Query("phone") String phone,@Query("password") String password);
 
     @POST("nearest-bin")

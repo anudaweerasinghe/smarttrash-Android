@@ -64,13 +64,11 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
     TextView typeLabel;
     Button Dispose;
     TextView dateLabel;
-    TextView navNameLabel;
-    TextView navPhoneLabel;
     final Context context= this;
     private GoogleMap Map;
     private FusedLocationProviderClient mFusedLocationClient;
     private int numberOfRedemptions= 3;
-//    SharedPreferences.Editor editor;
+    SharedPreferences.Editor editor;
 
 
 
@@ -81,8 +79,6 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
         typeLabel = (TextView) findViewById(R.id.typeLabel);
         Dispose = (Button) findViewById(R.id.btnDispose);
         dateLabel = (TextView) findViewById(R.id.dateLabel);
-        navNameLabel = (TextView) findViewById(R.id.nav_name_text);
-        navPhoneLabel = (TextView) findViewById(R.id.nav_name_text);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Dispose.setOnClickListener(this);
@@ -94,20 +90,25 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         toggle.syncState();
 
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
+        editor = pref.edit();
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View hview = navigationView.getHeaderView(0);
+        TextView navPhoneLabel = (TextView)hview.findViewById(R.id.nav_mobile_text);
+        String phoneLabel = pref.getString("Mobile", "");
+        navPhoneLabel.setText(phoneLabel);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.dashmap);
         mapFragment.getMapAsync(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-//        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
-//        editor = pref.edit();
+
 //        numberOfRedemptions = pref.getInt("Redemptions",0);
 
-//        navNameLabel.setText(pref.getString("Name",null));
-//        navPhoneLabel.setText(pref.getString("Mobile",null));
+
     }
 
     @Override
@@ -155,8 +156,8 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
             startActivity(sendIntent);
 
         } else if (id == R.id.nav_logout) {
-//            editor.clear();
-//            editor.commit();
+            editor.clear();
+            editor.commit();
             Intent intentNew = new Intent(Dashboard.this, LoginActivity.class);
             startActivity(intentNew);
         }else if (id == R.id.nav_collector) {
@@ -228,7 +229,7 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
     private void setMarker(Location loc){
         LatLng location = new LatLng(loc.getLatitude(), loc.getLongitude());
         Map.addMarker(new MarkerOptions().position(location).title("Current Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(location).zoom(17).bearing(0).tilt(0).build();
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(location).zoom(12).bearing(0).tilt(0).build();
         Map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 //        mMap.moveCamera(CameraUpdateFactory.zoomIn(newLatLng(location)).);
 
@@ -249,7 +250,7 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
                     String info = response.body().get(i).getInfo();
                     LatLng binLocations = new LatLng(lat,lng);
 
-                    Map.addMarker(new MarkerOptions().position(binLocations).title(name).icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)).snippet(info));
+                    Map.addMarker(new MarkerOptions().position(binLocations).title("Dialog @"+name).icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)).snippet(info));
 
                 }
 

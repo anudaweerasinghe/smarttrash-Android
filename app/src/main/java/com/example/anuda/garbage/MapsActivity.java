@@ -49,8 +49,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationClient;
-//    Editor editor;
-    TextView navNameLabel;
+    Editor editor;
     TextView navPhoneLabel;
 
 
@@ -65,16 +64,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         Toolbar toolbarmaps = (Toolbar) findViewById(R.id.toolbarmaps);
         setSupportActionBar(toolbarmaps);
-        navNameLabel = (TextView) findViewById(R.id.nav_name_text);
-        navPhoneLabel = (TextView) findViewById(R.id.nav_name_text);
+//        navPhoneLabel = (TextView) findViewById(R.id.nav_name_text);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_maps);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbarmaps, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         toggle.syncState();
 
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
+        editor = pref.edit();
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View hview = navigationView.getHeaderView(0);
+        TextView navPhoneLabel = (TextView)hview.findViewById(R.id.nav_mobile_text);
+        String phoneLabel = pref.getString("Mobile", "");
+        navPhoneLabel.setText(phoneLabel);
 
                 FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.locationfab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -84,11 +89,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-//        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
-//        editor = pref.edit();
-//
-//        navNameLabel.setText(pref.getString("Name",null));
-//        navPhoneLabel.setText(pref.getString("Mobile",null));
+
+
 
 
     }
@@ -136,8 +138,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
         } else if (id == R.id.nav_logout) {
-//            editor.clear();
-//            editor.commit();
+            editor.clear();
+            editor.commit();
             Intent intentNew = new Intent(MapsActivity.this, LoginActivity.class);
             startActivity(intentNew);
         }else if (id == R.id.nav_collector) {
@@ -202,7 +204,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void setMarker(Location loc){
         LatLng location = new LatLng(loc.getLatitude(), loc.getLongitude());
         mMap.addMarker(new MarkerOptions().position(location).title("Current Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
-        CameraPosition cameraPosition = new CameraPosition.Builder().target(location).zoom(17).bearing(0).tilt(0).build();
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(location).zoom(15).bearing(0).tilt(0).build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 //        mMap.moveCamera(CameraUpdateFactory.zoomIn(newLatLng(location)).);
 
@@ -223,7 +225,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     String info = response.body().get(i).getInfo();
                     LatLng binLocations = new LatLng(lat,lng);
 
-                    mMap.addMarker(new MarkerOptions().position(binLocations).title(name).icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)).snippet(info));
+                    mMap.addMarker(new MarkerOptions().position(binLocations).title("Dialog @"+name).icon(BitmapDescriptorFactory.fromResource(R.drawable.binmarker)).snippet(info));
 
                 }
 

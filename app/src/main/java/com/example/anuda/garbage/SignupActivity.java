@@ -36,6 +36,8 @@ public class SignupActivity extends AppCompatActivity {
     @Bind(R.id.link_login)
     TextView _loginLink;
     Editor editor;
+    private String mobile;
+    private String password;
 
 
     @Override
@@ -62,8 +64,8 @@ public class SignupActivity extends AppCompatActivity {
             }
         });
 
-//        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
-//        editor = pref.edit();
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", MODE_PRIVATE); // 0 - for private mode
+        editor = pref.edit();
     }
 
     public void signup() {
@@ -84,15 +86,11 @@ public class SignupActivity extends AppCompatActivity {
 
         String name = _nameText.getText().toString();
         String address = _addressText.getText().toString();
-        String mobile = _mobileText.getText().toString();
-        String password = _passwordText.getText().toString();
+        mobile = _mobileText.getText().toString();
+        password = _passwordText.getText().toString();
         String reEnterPassword = _reEnterPasswordText.getText().toString();
 
-//        editor.putString("Mobile",mobile);
-//        editor.putString("Name",name);
-//        editor.putString("Password",password);
-//        editor.putBoolean("LogIn status",true);
-//        editor.commit();
+
 
         SignUp signUp = new SignUp();
 
@@ -142,6 +140,11 @@ public class SignupActivity extends AppCompatActivity {
     public void onSignupSuccess() {
         _signupButton.setEnabled(true);
         setResult(RESULT_OK, null);
+        editor.clear();
+        editor.putString("Mobile",mobile);
+        editor.putString("Password",password);
+        editor.putBoolean("LogIn status",true);
+        editor.commit();
         Intent intentNew = new Intent(SignupActivity.this, Dashboard.class);
         startActivity(intentNew);
         finish();

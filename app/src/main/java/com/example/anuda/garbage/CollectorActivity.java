@@ -23,9 +23,9 @@ public class CollectorActivity extends AppCompatActivity implements View.OnClick
 
     TextView info;
     Button forms;
-//    Editor editor;
-    TextView navNameLabel;
+    Editor editor;
     TextView navPhoneLabel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,8 +34,7 @@ public class CollectorActivity extends AppCompatActivity implements View.OnClick
         forms = (Button)findViewById(R.id.formbutton);
         forms.setOnClickListener(this);
         info.setText("The next stage of this project is to expand beyond only e-waste disposal to a solution for all recyclable waste disposal. In order to do this, we plan to crowdsource the problem to the recycling community. We plan to connect the recycler to the consumer. As a recycler, this will ensure you with an efficient way to bring in customers. If you are interested, please click the button below and provide us with some information about you and your business.");
-        navNameLabel = (TextView) findViewById(R.id.nav_name_text);
-        navPhoneLabel = (TextView) findViewById(R.id.nav_name_text);
+
 
         Toolbar toolbarcollector = (Toolbar) findViewById(R.id.toolbarcollector);
         setSupportActionBar(toolbarcollector);
@@ -45,14 +44,16 @@ public class CollectorActivity extends AppCompatActivity implements View.OnClick
                 this, drawer, toolbarcollector, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         toggle.syncState();
 
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
+        editor = pref.edit();
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View hview = navigationView.getHeaderView(0);
+        TextView navPhoneLabel = (TextView)hview.findViewById(R.id.nav_mobile_text);
+        String phoneLabel = pref.getString("Mobile", "");
+        navPhoneLabel.setText(phoneLabel);
 
-//        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
-//        editor = pref.edit();
-//
-//        navNameLabel.setText(pref.getString("Name",null));
-//        navPhoneLabel.setText(pref.getString("Mobile",null));
     }
 
     @Override
@@ -117,8 +118,8 @@ public class CollectorActivity extends AppCompatActivity implements View.OnClick
             sendIntent.setType("text/plain");
             startActivity(sendIntent);
         } else if (id == R.id.nav_logout) {
-//            editor.clear();
-//            editor.commit();
+            editor.clear();
+            editor.commit();
             Intent intentNew = new Intent(CollectorActivity.this, LoginActivity.class);
             startActivity(intentNew);
         }else if (id == R.id.nav_collector) {
