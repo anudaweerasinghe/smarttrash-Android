@@ -64,10 +64,10 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
     TextView typeLabel;
     Button Dispose;
     TextView dateLabel;
-    final Context context= this;
+    final Context context = this;
     private GoogleMap Map;
     private FusedLocationProviderClient mFusedLocationClient;
-    private int numberOfRedemptions= 3;
+    private int numberOfRedemptions;
     SharedPreferences.Editor editor;
     String message;
     String title;
@@ -85,7 +85,8 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
         setSupportActionBar(toolbar);
         Dispose.setOnClickListener(this);
 
-        lastTransaction();
+
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_dashboard);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -108,28 +109,46 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
 
-//        numberOfRedemptions = pref.getInt("Redemptions",0);
+        numberOfRedemptions = pref.getInt("numberOfRedemptions",0);
+        lastTransaction();
 
-        if(getIntent().getBooleanExtra("verifystatus",false)==false){
+        if(getIntent()!=null) {
 
-        }else{
-            Boolean verifyStatus = getIntent().getBooleanExtra("verifystatus",false);
+            if (!getIntent().getBooleanExtra("verifystatus", false)) {
 
-            if(verifyStatus==true){
-                Call<Void> redeemCall = RestClient.garbageBinService.redeem(phoneLabel);
-                redeemCall.enqueue(new Callback<Void>() {
-                    @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
-                        if(response.code()==200){
-                            title = "Successfully Redeemed";
-                            message = "Thank You for your disposal! You will receive your reward shortly.";
-                            redeemMessage(new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
+            } else {
+                Boolean verifyStatus = getIntent().getBooleanExtra("verifystatus", false);
 
-                                }
-                            });
-                        }else{
+                if (verifyStatus == true) {
+
+                    Call<Void> redeemCall = RestClient.garbageBinService.redeem(phoneLabel);
+                    redeemCall.enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            if (response.code() == 200) {
+                                title = "Successfully Redeemed";
+                                message = "Thank You for your disposal! You will receive your reward shortly.";
+                                redeemMessage(new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                });
+                            } else {
+                                title = "Redemption Error";
+                                message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
+                                redeemMessage(new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Intent intentNew = new Intent(Dashboard.this, RedeemActivity.class);
+                                        startActivity(intentNew);
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
                             title = "Redemption Error";
                             message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
                             redeemMessage(new DialogInterface.OnClickListener() {
@@ -140,23 +159,10 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
                                 }
                             });
                         }
-                    }
+                    });
+                } else {
 
-                    @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
-                        title = "Redemption Error";
-                        message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
-                        redeemMessage(new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent intentNew = new Intent(Dashboard.this, RedeemActivity.class);
-                                startActivity(intentNew);
-                            }
-                        });
-                    }
-                });
-            }else{
-
+                }
             }
         }
 
@@ -233,9 +239,9 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
     }
 
     public void lastTransaction() {
-        typeLabel.setText("Last Disposal\n\nUnion Place");
+        typeLabel.setText("Waste Type\n\ne-Waste");
 
-        dateLabel.setText("Total Earnings\n\n"+50*numberOfRedemptions+"MB");
+        dateLabel.setText("Recent Earnings\n\n"+50*numberOfRedemptions+"MB");
     }
 
     @Override

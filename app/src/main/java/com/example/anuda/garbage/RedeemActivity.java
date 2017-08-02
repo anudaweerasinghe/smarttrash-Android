@@ -74,7 +74,7 @@ public class RedeemActivity extends AppCompatActivity implements NavigationView.
                 this, drawer, toolbarredeem, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         toggle.syncState();
 
-        SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
+        final SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
         editor = pref.edit();
          verifyBtn = (Button) findViewById(R.id.verifyQR);
 
@@ -121,7 +121,10 @@ public class RedeemActivity extends AppCompatActivity implements NavigationView.
                                     if (qrValue.equals("Verified")) {
 
                                         verifyStatus = true;
+                                        Integer numberOfRedemptions = (pref.getInt("numberOfRedemptions",0))+1;
 
+                                        editor.putInt("numberOfRedemptions",numberOfRedemptions);
+                                        editor.commit();
                                         Intent intentRedeem = new Intent (RedeemActivity.this, Dashboard.class);
                                         intentRedeem.putExtra("verifystatus",verifyStatus);
                                         startActivity(intentRedeem);
