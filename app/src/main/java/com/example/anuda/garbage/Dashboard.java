@@ -69,6 +69,8 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
     private FusedLocationProviderClient mFusedLocationClient;
     private int numberOfRedemptions= 3;
     SharedPreferences.Editor editor;
+    String message;
+    String title;
 
 
 
@@ -107,6 +109,58 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
 
 
 //        numberOfRedemptions = pref.getInt("Redemptions",0);
+
+        if(getIntent().getBooleanExtra("verifystatus",false)==false){
+
+        }else{
+            Boolean verifyStatus = getIntent().getBooleanExtra("verifystatus",false);
+
+            if(verifyStatus==true){
+                Call<Void> redeemCall = RestClient.garbageBinService.redeem(phoneLabel);
+                redeemCall.enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                        if(response.code()==200){
+                            title = "Successfully Redeemed";
+                            message = "Thank You for your disposal! You will receive your reward shortly.";
+                            redeemMessage(new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                }
+                            });
+                        }else{
+                            title = "Redemption Error";
+                            message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
+                            redeemMessage(new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intentNew = new Intent(Dashboard.this, RedeemActivity.class);
+                                    startActivity(intentNew);
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                        title = "Redemption Error";
+                        message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
+                        redeemMessage(new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intentNew = new Intent(Dashboard.this, RedeemActivity.class);
+                                startActivity(intentNew);
+                            }
+                        });
+                    }
+                });
+            }else{
+
+            }
+        }
+
+
 
 
     }
@@ -273,7 +327,14 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
                 .create()
                 .show();
     }
-
+    private void redeemMessage(DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(Dashboard.this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .create()
+                .show();
+    }
 
 }
 

@@ -30,6 +30,9 @@ public interface GarbageBinService {
     @GET("all-bins")
     Call<List<Bins>>bins();
 
+    @GET("redeem")
+    Call<Void> redeem(@Query("phone")String phone);
+
 
 
 }
