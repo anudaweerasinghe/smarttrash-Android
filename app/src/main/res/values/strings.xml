@@ -8,6 +8,9 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="Nearby">Nearby</string>
+    <string name="Collector">Collector</string>
+    <string name="Dispose">Dispose</string>
+
 
     <string name="facebook_app_id">293615674380241</string>
     <string name="fb_login_protocol_scheme">fb293615674380241</string>

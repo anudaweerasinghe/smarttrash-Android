@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.anuda.garbage">
+    package="com.smarttrash.anuda.garbage">
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -15,7 +15,7 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="IdeaTrash"
+        android:label="SmartTrash"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Dark">
@@ -63,8 +63,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DisposeActivity" />
-        <activity android:name=".CollectorActivity" />
+        <activity android:name=".DisposeActivity"
+            android:label="@string/Dispose"/>
+        <activity android:name=".CollectorActivity"
+            android:label="@string/Collector"/>
+
         <activity android:name=".Dashboard"></activity>
     </application>
 
