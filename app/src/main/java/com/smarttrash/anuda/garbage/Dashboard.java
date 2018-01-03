@@ -39,6 +39,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.List;
 
 import Helpers.RestClient;
+import models.api_models.RedeemRequest;
+import models.api_models.RewardsStatusRequest;
 import models.app_models.Bins;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -53,6 +55,8 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
     TextView typeLabel;
     Button Dispose;
     TextView dateLabel;
+    Double currentLat;
+    Double currentLng;
     final Context context = this;
     private GoogleMap Map;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -88,72 +92,42 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View hview = navigationView.getHeaderView(0);
+        TextView navNameLabel = (TextView)hview.findViewById(R.id.nav_name_text);
         TextView navPhoneLabel = (TextView)hview.findViewById(R.id.nav_mobile_text);
         String phoneLabel = pref.getString("Mobile", "");
+        String nameLabel = pref.getString("Name","");
         navPhoneLabel.setText(phoneLabel);
+        navNameLabel.setText(nameLabel);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.dashmap);
         mapFragment.getMapAsync(this);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        RewardsStatusRequest rewardsStatusRequest = new RewardsStatusRequest();
 
-        numberOfRedemptions = pref.getInt("numberOfRedemptions",0);
+        rewardsStatusRequest.setPhone(phoneLabel);
+
+        Call<Integer> rewardsStatusCall = RestClient.garbageBinService.redeemStatus(rewardsStatusRequest);
+
+        rewardsStatusCall.enqueue(new Callback<Integer>() {
+            @Override
+            public void onResponse(Call<Integer> call, Response<Integer> response) {
+
+                dateLabel.setText("Recent Earnings\n\n"+response.body()+" MB");
+
+            }
+
+            @Override
+            public void onFailure(Call<Integer> call, Throwable t) {
+
+                dateLabel.setText("Error");
+            }
+        });
+
         lastTransaction();
 
-        if(getIntent()!=null) {
-
-            if (!getIntent().getBooleanExtra("verifystatus", false)) {
-
-            } else {
-                Boolean verifyStatus = getIntent().getBooleanExtra("verifystatus", false);
-
-                if (verifyStatus == true) {
-
-                    Call<Void> redeemCall = RestClient.garbageBinService.redeem(phoneLabel);
-                    redeemCall.enqueue(new Callback<Void>() {
-                        @Override
-                        public void onResponse(Call<Void> call, Response<Void> response) {
-                            if (response.code() == 200) {
-                                title = "Successfully Redeemed";
-                                message = "Thank You for your disposal! You will receive your reward shortly.";
-                                redeemMessage(new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                    }
-                                });
-                            } else {
-                                title = "Redemption Error";
-                                message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
-                                redeemMessage(new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Intent intentNew = new Intent(Dashboard.this, RedeemActivity.class);
-                                        startActivity(intentNew);
-                                    }
-                                });
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<Void> call, Throwable t) {
-                            title = "Redemption Error";
-                            message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
-                            redeemMessage(new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Intent intentNew = new Intent(Dashboard.this, RedeemActivity.class);
-                                    startActivity(intentNew);
-                                }
-                            });
-                        }
-                    });
-                } else {
-
-                }
-            }
-        }
+//        
 
 
 
@@ -230,7 +204,6 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
     public void lastTransaction() {
         typeLabel.setText("Waste Type\n\ne-Waste");
 
-        dateLabel.setText("Recent Earnings\n\n"+50*numberOfRedemptions+"MB");
     }
 
     @Override
@@ -255,6 +228,8 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
                     public void onSuccess(Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
+
+
                             setMarker(location);
 
 
@@ -330,6 +305,8 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
                 .create()
                 .show();
     }
+
+
 
 }
 

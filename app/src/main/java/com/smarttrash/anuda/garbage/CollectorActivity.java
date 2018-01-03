@@ -50,9 +50,12 @@ public class CollectorActivity extends AppCompatActivity implements View.OnClick
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View hview = navigationView.getHeaderView(0);
+        TextView navNameLabel = (TextView)hview.findViewById(R.id.nav_name_text);
         TextView navPhoneLabel = (TextView)hview.findViewById(R.id.nav_mobile_text);
         String phoneLabel = pref.getString("Mobile", "");
+        String nameLabel = pref.getString("Name","");
         navPhoneLabel.setText(phoneLabel);
+        navNameLabel.setText(nameLabel);
 
     }
 

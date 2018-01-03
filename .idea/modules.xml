@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Garbage.iml" filepath="$PROJECT_DIR$/Garbage.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ideatrash.iml" filepath="$PROJECT_DIR$/ideatrash.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ideatrash-android.iml" filepath="$PROJECT_DIR$/ideatrash-android.iml" />
     </modules>
   </component>
 </project>

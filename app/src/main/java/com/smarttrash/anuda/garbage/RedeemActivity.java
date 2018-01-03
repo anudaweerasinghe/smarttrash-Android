@@ -1,9 +1,14 @@
 package com.smarttrash.anuda.garbage;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.location.Location;
+import android.os.Vibrator;
+import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -12,6 +17,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
@@ -23,12 +29,21 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
+
+import Helpers.RestClient;
+import models.api_models.RedeemRequest;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class RedeemActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -40,9 +55,16 @@ public class RedeemActivity extends AppCompatActivity implements NavigationView.
     Editor editor;
     String message;
     String title;
+    String phoneLabel;
     Button verifyBtn;
     private String qrValue;
-    Boolean verifyStatus=false;
+    Boolean verifyStatus = false;
+    Double currentlat;
+    Double currentlng;
+
+    private FusedLocationProviderClient mFusedLocationClient;
+
+
 
 
     @Override
@@ -52,6 +74,9 @@ public class RedeemActivity extends AppCompatActivity implements NavigationView.
 
         Toolbar toolbarredeem = (Toolbar) findViewById(R.id.toolbarredeem);
         setSupportActionBar(toolbarredeem);
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
 
         ImageView qrFram = (ImageView) findViewById(R.id.qrFrame);
         qrFram.setVisibility(View.VISIBLE);
@@ -63,14 +88,18 @@ public class RedeemActivity extends AppCompatActivity implements NavigationView.
 
         final SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", 0); // 0 - for private mode
         editor = pref.edit();
-         verifyBtn = (Button) findViewById(R.id.verifyQR);
+        verifyBtn = (Button) findViewById(R.id.verifyQR);
+        verifyBtn.setEnabled(true);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View hview = navigationView.getHeaderView(0);
+        TextView navNameLabel = (TextView) hview.findViewById(R.id.nav_name_text);
         TextView navPhoneLabel = (TextView) hview.findViewById(R.id.nav_mobile_text);
-        final String phoneLabel = pref.getString("Mobile", "");
+        phoneLabel = pref.getString("Mobile", "");
+        String nameLabel = pref.getString("Name", "");
         navPhoneLabel.setText(phoneLabel);
+        navNameLabel.setText(nameLabel);
 
 
         cameraView = (SurfaceView) findViewById(R.id.camera_view);
@@ -84,12 +113,18 @@ public class RedeemActivity extends AppCompatActivity implements NavigationView.
         cameraSource = new CameraSource
                 .Builder(this, barcodeDetector)
                 .setAutoFocusEnabled(true)
-                .setRequestedPreviewSize(800, 800)
+                .setRequestedPreviewSize(1920,1080)
                 .build();
+
+        getLastLocation();
+
+
 
         verifyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                verifyBtn.setEnabled(false);
 
                 barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
                     @Override
@@ -104,38 +139,125 @@ public class RedeemActivity extends AppCompatActivity implements NavigationView.
                             barcodeInfo.post(new Runnable() {    // Use the post method of the TextView
                                 public void run() {
                                     qrValue = barcodes.valueAt(0).displayValue;
+                                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                    // Vibrate for 500 milliseconds
+                                    v.vibrate(500);
 
-                                    if (qrValue.equals("Verified")) {
+                                    final ProgressDialog progressDialog = new ProgressDialog(RedeemActivity.this,
+                                            R.style.AppTheme_Dark_Dialog);
+                                    progressDialog.setIndeterminate(true);
+                                    progressDialog.setMessage("Verifying...");
+                                    progressDialog.show();
 
-                                        verifyStatus = true;
-                                        Integer numberOfRedemptions = (pref.getInt("numberOfRedemptions",0))+1;
+                                    byte[] value = qrValue.getBytes();
 
-                                        editor.putInt("numberOfRedemptions",numberOfRedemptions);
-                                        editor.commit();
-                                        Intent intentRedeem = new Intent (RedeemActivity.this, Dashboard.class);
-                                        intentRedeem.putExtra("verifystatus",verifyStatus);
-                                        startActivity(intentRedeem);
-                                        finish();
+                                    byte[] encrypted = Base64.encode(value, Base64.NO_WRAP);
 
-                                    }else{
-                                        barcodeDetector.release();
-                                        title = "Redemption Error";
-                                        message = "Unfortunately we encountered an error while verifying your disposal. Please Try again.";
-                                        showMessageOKCancel(
-                                                new DialogInterface.OnClickListener() {
+                                    String strEncrypted = new String(encrypted);
+
+
+                                    barcodeDetector.release();
+
+                                    RedeemRequest redeemRequest = new RedeemRequest();
+
+                                    redeemRequest.setAuthCode(strEncrypted);
+                                    redeemRequest.setPhone(phoneLabel);
+                                    redeemRequest.setRedeemLat(currentlat);
+                                    redeemRequest.setRedeemLng(currentlng);
+
+                                    Call<Void> redeemCall = RestClient.garbageBinService.redeem(redeemRequest);
+                                    redeemCall.enqueue(new Callback<Void>() {
+                                        @Override
+                                        public void onResponse(Call<Void> call, Response<Void> response) {
+                                            if (response.code() == 200) {
+                                                progressDialog.hide();
+                                                title = "Successfully Redeemed";
+                                                message = "Thank You for your disposal! You will receive your reward shortly.";
+                                                redeemMessage(new DialogInterface.OnClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which) {
-                                                        Intent intentNew = new Intent(RedeemActivity.this, RedeemActivity.class);
+                                                        Intent intentNew = new Intent(RedeemActivity.this, Dashboard.class);
                                                         startActivity(intentNew);
                                                     }
                                                 });
-                                    }
+                                            }else if(response.code()==403){
+                                                progressDialog.hide();
+                                                title = "Limit Reached";
+                                                message = "You have already reached your daily redemption limit. Please try again tomorrow";
+                                                redeemMessage(new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        verifyBtn.setEnabled(true);
+                                                    }
+                                                });
+                                            } else if(response.code()==406){
+                                                progressDialog.hide();
+                                                title = "Redemption Failure";
+                                                message = "You are not near an active bin to redeem your reward. Please try again";
+                                                redeemMessage(new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        verifyBtn.setEnabled(true);
+                                                    }
+                                                });
+                                            }else if (response.code()==401){
+                                                progressDialog.hide();
+                                                title = "Invalid QR code";
+                                                message = "You are not at an authorized bin";
+                                                redeemMessage(new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        verifyBtn.setEnabled(true);
+                                                    }
+                                                });
+                                            }else {
+                                                progressDialog.hide();
+                                                title = "Redemption Error";
+                                                message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
+                                                redeemMessage(new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        verifyBtn.setEnabled(true);
+                                                    }
+                                                });
+                                            }
+                                        }
 
+                                        @Override
+                                        public void onFailure(Call<Void> call, Throwable t) {
+                                            title = "Redemption Error";
+                                            message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
+                                            redeemMessage(new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    verifyBtn.setEnabled(true);
+                                                }
+                                            });
+                                        }
+                                    });
 
+//                                    verifyStatus = true;
+//
+//                                    Intent intentRedeem = new Intent(RedeemActivity.this, Dashboard.class);
+//                                    intentRedeem.putExtra("verifystatus", verifyStatus);
+//                                    intentRedeem.putExtra("encrypted", strEncrypted);
+//                                    startActivity(intentRedeem);
+//                                    finish();
 
 
                                 }
                             });
+                        }else{
+                            title = "Redemption Error";
+                            message = "Unfortunately we encountered an error while verifying your disposal. Please Try again.";
+                            showMessageOKCancel(
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent intentNew = new Intent(RedeemActivity.this, RedeemActivity.class);
+                                            startActivity(intentNew);
+                                        }
+                                    });
                         }
                     }
                 });
@@ -162,8 +284,6 @@ public class RedeemActivity extends AppCompatActivity implements NavigationView.
                 cameraSource.stop();
             }
         });
-
-
 
 
     }
@@ -231,6 +351,37 @@ public class RedeemActivity extends AppCompatActivity implements NavigationView.
                 .setPositiveButton("OK", okListener)
                 .create()
                 .show();
+    }
+
+    private void redeemMessage(DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(RedeemActivity.this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .create()
+                .show();
+    }
+
+    private void getLastLocation(){
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+
+
+                            currentlat=location.getLatitude();
+                            currentlng=location.getLongitude();
+
+                        }else{
+
+
+//
+                        }
+                    }
+                });
+
     }
 }
 

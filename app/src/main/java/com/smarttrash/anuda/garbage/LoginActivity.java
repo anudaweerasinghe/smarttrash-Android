@@ -17,6 +17,7 @@ import android.widget.Toast;
 import Helpers.RestClient;
 import butterknife.ButterKnife;
 import butterknife.Bind;
+import models.api_models.SignUp;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -27,13 +28,12 @@ public class LoginActivity extends AppCompatActivity {
 
     @Bind(R.id.input_mobile)
     EditText _mobileText;
-    @Bind(R.id.input_password) EditText _passwordText;
+    @Bind(R.id.input_name)
+    EditText _nameText;
     @Bind(R.id.btn_login)
     Button _loginButton;
-    @Bind(R.id.link_signup)
-    TextView _signupLink;
     private String mobile;
-    private String password;
+    private String name;
     Editor editor;
 
     @Override
@@ -51,17 +51,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        _signupLink.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                // Start the Signup activity
-                Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
-                startActivityForResult(intent, REQUEST_SIGNUP);
-                finish();
-                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-            }
-        });
 
         SharedPreferences pref = getApplicationContext().getSharedPreferences("IdeaTrash Preferences", MODE_PRIVATE); // 0 - for private mode
         editor = pref.edit();
@@ -83,6 +73,9 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
+        name=_nameText.getText().toString();
+        mobile=_mobileText.getText().toString();
+
         _loginButton.setEnabled(false);
 
         final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
@@ -92,20 +85,23 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog.show();
 
 
+        SignUp signUp = new SignUp();
+
+        signUp.setName(name);
+
+        signUp.setPhone(mobile);
 
 
+        Call<Void> signUpCall=RestClient.garbageBinService.signUp(signUp);
 
-        Call<Void> logInCall = RestClient.garbageBinService.logIn(mobile,password);
-
-        logInCall.enqueue(new Callback<Void>() {
+        signUpCall.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if(response.code()==401){
-                    onLoginFailed();
-                }else {
+                if(response.code()==200){
                     onLoginSuccess();
+                }else{
+                    onLoginFailed();
                 }
-
             }
 
             @Override
@@ -113,6 +109,27 @@ public class LoginActivity extends AppCompatActivity {
                 onLoginFailed();
             }
         });
+
+//        Call<SignUp> signUpCall= RestClient.garbageBinService.signUp(signUp);
+//
+//
+//        signUpCall.enqueue(new Callback<SignUp>() {
+//            @Override
+//            public void onResponse(Call<SignUp> call, Response<SignUp> response) {
+//                // The network call was a success and we got a response
+//                if(response.code()==200){
+//                    onLoginSuccess();
+//                }else{
+//                    onLoginFailed();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<SignUp> call, Throwable t) {
+//                // the network call was a failure
+//                onLoginFailed();
+//            }
+//        });
 
         // TODO: Implement your own authentication logic here.
 
@@ -125,6 +142,7 @@ public class LoginActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                     }
                 }, 3000);
+
     }
 
 
@@ -151,14 +169,14 @@ public class LoginActivity extends AppCompatActivity {
         editor.clear();
         editor.putBoolean("LogIn Status",true);
         editor.putString("Mobile",mobile);
-        editor. putString("Password", password);
+        editor. putString("Name", name);
         editor.commit();
         Intent intentNew = new Intent(LoginActivity.this, Dashboard.class);
         startActivity(intentNew);
     }
 
     public void onLoginFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "Login failed. Please Try again", Toast.LENGTH_LONG).show();
 
         _loginButton.setEnabled(true);
     }
@@ -167,7 +185,7 @@ public class LoginActivity extends AppCompatActivity {
         boolean valid = true;
 
          mobile = _mobileText.getText().toString();
-         password = _passwordText.getText().toString();
+         name = _nameText.getText().toString();
 
         if (mobile.isEmpty() || mobile.length()!=9) {
             _mobileText.setError("Enter Valid Mobile Number");
@@ -176,11 +194,11 @@ public class LoginActivity extends AppCompatActivity {
             _mobileText.setError(null);
         }
 
-        if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
-            _passwordText.setError("Between 4 and 10 alphanumeric characters");
+        if (name.isEmpty() || name.length() < 3) {
+            _nameText.setError("at least 3 characters");
             valid = false;
         } else {
-            _passwordText.setError(null);
+            _nameText.setError(null);
         }
 
         return valid;
