@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RestClient {
 
    static Retrofit RequestObject = new Retrofit.Builder()
-            .baseUrl("http://128.199.229.198:8080/garbageback/garbageapi/")
+            .baseUrl("http://128.199.121.89:8080/garbageback/garbageapi/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
