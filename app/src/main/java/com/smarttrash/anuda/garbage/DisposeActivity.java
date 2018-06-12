@@ -256,7 +256,7 @@ public class DisposeActivity extends AppCompatActivity implements OnMapReadyCall
             startActivity(intentNew);
 
         } else if (id == R.id.nav_redeem) {
-            Intent intentNew = new Intent(DisposeActivity.this, RedeemActivity.class);
+            Intent intentNew = new Intent(DisposeActivity.this, RedeemQRActivity.class);
             startActivity(intentNew);
         }else if (id == R.id.nav_share) {
             Intent sendIntent = new Intent();

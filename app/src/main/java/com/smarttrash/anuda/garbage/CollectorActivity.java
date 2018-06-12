@@ -112,7 +112,7 @@ public class CollectorActivity extends AppCompatActivity implements View.OnClick
             startActivity(intentNew);
 
         } else if (id == R.id.nav_redeem) {
-            Intent intentNew = new Intent(CollectorActivity.this,RedeemActivity.class);
+            Intent intentNew = new Intent(CollectorActivity.this,RedeemQRActivity.class);
             startActivity(intentNew);
         }else if (id == R.id.nav_share) {
             Intent sendIntent = new Intent();

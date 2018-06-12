@@ -39,7 +39,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.List;
 
 import Helpers.RestClient;
-import models.api_models.RedeemRequest;
 import models.api_models.RewardsStatusRequest;
 import models.app_models.Bins;
 import retrofit2.Call;
@@ -167,7 +166,7 @@ public class Dashboard extends AppCompatActivity implements View.OnClickListener
             startActivity(intentNew);
 
         } else if (id == R.id.nav_redeem) {
-            Intent intentNew = new Intent(Dashboard.this, RedeemActivity.class);
+            Intent intentNew = new Intent(Dashboard.this, RedeemQRActivity.class);
             startActivity(intentNew);
 
         }

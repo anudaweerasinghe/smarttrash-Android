@@ -130,7 +130,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         }
         else if (id == R.id.nav_redeem) {
-            Intent intentNew = new Intent(MapsActivity.this, RedeemActivity.class);
+            Intent intentNew = new Intent(MapsActivity.this, RedeemQRActivity.class);
             startActivity(intentNew);
         }else if (id == R.id.nav_share) {
             Intent sendIntent = new Intent();
