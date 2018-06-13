@@ -39,7 +39,7 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     compile 'com.google.android.gms:play-services:11.0.1'
-    compile 'net.gotev:uploadservice:2.1'
+    compile 'net.gotev:uploadservice:3.0'
 
     testCompile 'junit:junit:4.12'
 }

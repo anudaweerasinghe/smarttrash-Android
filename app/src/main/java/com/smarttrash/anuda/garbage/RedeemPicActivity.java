@@ -36,14 +36,19 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.ServerResponse;
+import net.gotev.uploadservice.UploadInfo;
 import net.gotev.uploadservice.UploadNotificationConfig;
+import net.gotev.uploadservice.UploadStatusDelegate;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,13 +73,14 @@ public class RedeemPicActivity extends AppCompatActivity {
     String message;
     String title;
 
-//    Check state orientation of output image
+    //    Check state orientation of output image
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
-    static{
-        ORIENTATIONS.append(Surface.ROTATION_0,90);
-        ORIENTATIONS.append(Surface.ROTATION_90,0);
-        ORIENTATIONS.append(Surface.ROTATION_180,270);
-        ORIENTATIONS.append(Surface.ROTATION_270,180);
+
+    static {
+        ORIENTATIONS.append(Surface.ROTATION_0, 90);
+        ORIENTATIONS.append(Surface.ROTATION_90, 0);
+        ORIENTATIONS.append(Surface.ROTATION_180, 270);
+        ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
 
     private String cameraId;
@@ -106,7 +112,7 @@ public class RedeemPicActivity extends AppCompatActivity {
         @Override
         public void onError(@NonNull CameraDevice cameraDevice, int i) {
             cameraDevice.close();
-            cameraDevice=null;
+            cameraDevice = null;
         }
     };
 
@@ -119,17 +125,19 @@ public class RedeemPicActivity extends AppCompatActivity {
 
     Bundle extras;
 
+    private String encodedImgDir;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_redeem_pic);
 
-        textureView = (TextureView)findViewById(R.id.textureView);
+        textureView = (TextureView) findViewById(R.id.textureView);
         //From Java 1.4 , you can use keyword 'assert' to check expression true or false
         assert textureView != null;
         textureView.setSurfaceTextureListener(textureListener);
-        btnCapture = (Button)findViewById(R.id.btnCapture);
+        btnCapture = (Button) findViewById(R.id.btnCapture);
         btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -137,40 +145,39 @@ public class RedeemPicActivity extends AppCompatActivity {
             }
         });
 
-        extras=getIntent().getExtras();
+        extras = getIntent().getExtras();
 
-        if(extras!=null){
+        if (extras != null) {
             lat = extras.getDouble("lat");
             lng = extras.getDouble("lng");
             qrCode = extras.getString("qrCode");
             phone = extras.getString("phone");
             loc = extras.getString("loc");
-        }else{
+        } else {
             Intent intentNew = new Intent(RedeemPicActivity.this, RedeemQRActivity.class);
             startActivity(intentNew);
         }
     }
 
     private void takePicture() {
-        if(cameraDevice == null)
+        if (cameraDevice == null)
             return;
-        CameraManager manager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
-        try{
+        CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        try {
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
             Size[] jpegSizes = null;
-            if(characteristics != null)
+            if (characteristics != null)
                 jpegSizes = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
                         .getOutputSizes(ImageFormat.JPEG);
 
             //Capture image with custom size
             int width = 640;
             int height = 480;
-            if(jpegSizes != null && jpegSizes.length > 0)
-            {
+            if (jpegSizes != null && jpegSizes.length > 0) {
                 width = jpegSizes[0].getWidth();
                 height = jpegSizes[0].getHeight();
             }
-            final ImageReader reader = ImageReader.newInstance(width,height,ImageFormat.JPEG,1);
+            final ImageReader reader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 1);
             List<Surface> outputSurface = new ArrayList<>(2);
             outputSurface.add(reader.getSurface());
             outputSurface.add(new Surface(textureView.getSurfaceTexture()));
@@ -181,63 +188,59 @@ public class RedeemPicActivity extends AppCompatActivity {
 
             //Check orientation base on device
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
-            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION,ORIENTATIONS.get(rotation));
+            captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
 
-            File dir = new File(Environment.getExternalStorageDirectory()+"/SmartTrash");
+            File dir = new File(Environment.getExternalStorageDirectory() + "/SmartTrash");
 
-            if(!dir.exists()){
+            if (!dir.exists()) {
                 dir.mkdir();
-            }else{
+            } else {
 
             }
 
-            file = new File(dir+"/"+UUID.randomUUID().toString()+".jpg");
+            file = new File(dir + "/" + UUID.randomUUID().toString() + ".jpg");
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader imageReader) {
                     Image image = null;
-                    try{
+                    try {
                         image = reader.acquireLatestImage();
                         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                         byte[] bytes = new byte[buffer.capacity()];
                         buffer.get(bytes);
                         save(bytes);
 
-                    }
-                    catch (FileNotFoundException e)
-                    {
+                    } catch (FileNotFoundException e) {
                         e.printStackTrace();
-                    }
-                    catch (IOException e)
-                    {
+                    } catch (IOException e) {
                         e.printStackTrace();
-                    }
-                    finally {
+                    } finally {
                         {
-                            if(image != null)
+                            if (image != null)
                                 image.close();
                         }
                     }
                 }
+
                 private void save(byte[] bytes) throws IOException {
                     OutputStream outputStream = null;
-                    try{
+                    try {
                         outputStream = new FileOutputStream(file);
                         outputStream.write(bytes);
-                    }finally {
-                        if(outputStream != null)
+                    } finally {
+                        if (outputStream != null)
                             outputStream.close();
                         uploadPicture(file);
                     }
                 }
             };
 
-            reader.setOnImageAvailableListener(readerListener,mBackgroundHandler);
+            reader.setOnImageAvailableListener(readerListener, mBackgroundHandler);
             final CameraCaptureSession.CaptureCallback captureListener = new CameraCaptureSession.CaptureCallback() {
                 @Override
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
-                    Toast.makeText(RedeemPicActivity.this, "Saved "+file, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RedeemPicActivity.this, "Saved " + file, Toast.LENGTH_SHORT).show();
                     createCameraPreview();
 
                 }
@@ -246,8 +249,8 @@ public class RedeemPicActivity extends AppCompatActivity {
             cameraDevice.createCaptureSession(outputSurface, new CameraCaptureSession.StateCallback() {
                 @Override
                 public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
-                    try{
-                        cameraCaptureSession.capture(captureBuilder.build(),captureListener,mBackgroundHandler);
+                    try {
+                        cameraCaptureSession.capture(captureBuilder.build(), captureListener, mBackgroundHandler);
                     } catch (CameraAccessException e) {
                         e.printStackTrace();
                     }
@@ -257,9 +260,7 @@ public class RedeemPicActivity extends AppCompatActivity {
                 public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
 
                 }
-            },mBackgroundHandler);
-
-
+            }, mBackgroundHandler);
 
 
         } catch (CameraAccessException e) {
@@ -279,25 +280,133 @@ public class RedeemPicActivity extends AppCompatActivity {
         String uploadId = UUID.randomUUID().toString();
 
 
-
-
         //Creating a multi part request
         try {
-            Toast.makeText(this, "Trying", Toast.LENGTH_SHORT).show();
-            new MultipartUploadRequest(this, uploadId, Constants.UPLOAD_URL)
+            String test = new MultipartUploadRequest(this, uploadId, Constants.UPLOAD_URL)
                     .addFileToUpload(pic.toString(), "file") //Adding file
-                    .addParameter("location",loc) //Adding text parameter to the request
+                    .addParameter("location", loc) //Adding text parameter to the request
                     .setNotificationConfig(new UploadNotificationConfig())
                     .setMaxRetries(2)
-                    .startUpload(); //St
-            Toast.makeText(this, "Finish", Toast.LENGTH_SHORT).show();
-        } catch (MalformedURLException | FileNotFoundException e) {
-            e.printStackTrace();
+                    .setDelegate(new UploadStatusDelegate() {
+                        @Override
+                        public void onProgress(UploadInfo uploadInfo) {
 
-            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
-        }
+                        }
+
+                        @Override
+                        public void onError(UploadInfo uploadInfo, Exception e) {
+                            progressDialog.dismiss();
+                            title = "Redemption Error";
+                            message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
+                            redeemMessage(new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intentNew = new Intent(RedeemPicActivity.this, Dashboard.class);
+                                    startActivity(intentNew);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onCompleted(UploadInfo uploadInfo, ServerResponse serverResponse) {
+                            progressDialog.dismiss();
+
+                            final ProgressDialog verifyProgressDialog = new ProgressDialog(RedeemPicActivity.this,
+                                    R.style.AppTheme_Dark_Dialog);
+                            verifyProgressDialog.setIndeterminate(true);
+                            verifyProgressDialog.setMessage("Verifying...");
+                            verifyProgressDialog.show();
+
+                            String dir = serverResponse.getBodyAsString();
+
+                            imgDir = dir.replace("/var/www/html/", "http://128.199.178.5/");
+
+                            encodedImgDir = imgDir.replaceAll("^\"|\"$", "");
+
+                            PicVerifyRequest request = new PicVerifyRequest();
+
+                            request.setImage(encodedImgDir);
+                            request.setLat(lat);
+                            request.setLng(lng);
+                            request.setPhone(phone);
+                            request.setQrCode(qrCode);
+
+                            Call<ResponseBody> picVerifyCall = RestClient.garbageBinService.verifyPic(request);
+
+                            picVerifyCall.enqueue(new Callback<ResponseBody>() {
+                                @Override
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                    verifyProgressDialog.dismiss();
+                                    if (response.code() == 200) {
+                                        title = "Successfully Redeemed";
+                                        message = "Thank You for your disposal! You will receive your reward shortly.";
+                                        redeemMessage(new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Intent intentNew = new Intent(RedeemPicActivity.this, Dashboard.class);
+                                                startActivity(intentNew);
+                                            }
+                                        });
+                                    } else {
+                                        title = "Redemption Error";
+                                        if (response.body() != null) {
+                                            message = response.body().toString();
+                                        } else {
+                                            message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
+                                        }
+                                        redeemMessage(new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Intent intentNew = new Intent(RedeemPicActivity.this, Dashboard.class);
+                                                startActivity(intentNew);
+                                            }
+                                        });
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                    verifyProgressDialog.dismiss();
+                                    title = "Redemption Error";
+                                    message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
+                                    redeemMessage(new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent intentNew = new Intent(RedeemPicActivity.this, Dashboard.class);
+                                            startActivity(intentNew);
+                                        }
+                                    });
 
 
+                                }
+
+                            });
+                        }
+
+                            @Override
+                            public void onCancelled (UploadInfo uploadInfo){
+
+                            }
+
+
+                        })
+
+                        .startUpload();
+
+
+                    } catch(MalformedURLException | FileNotFoundException e){
+                e.printStackTrace();
+                progressDialog.dismiss();
+                title = "Redemption Error";
+                message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
+                redeemMessage(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intentNew = new Intent(RedeemPicActivity.this, Dashboard.class);
+                        startActivity(intentNew);
+                    }
+                });
+            }
 
 
 //        Call<Void> uploadCall = RestClient.garbageBinService.uploadPic(body,loc);
@@ -408,20 +517,20 @@ public class RedeemPicActivity extends AppCompatActivity {
 //            }
 //        });
 
-    }
+        }
 
     private void createCameraPreview() {
-        try{
+        try {
             SurfaceTexture texture = textureView.getSurfaceTexture();
-            assert  texture != null;
-            texture.setDefaultBufferSize(imageDimension.getWidth(),imageDimension.getHeight());
+            assert texture != null;
+            texture.setDefaultBufferSize(imageDimension.getWidth(), imageDimension.getHeight());
             Surface surface = new Surface(texture);
             captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             captureRequestBuilder.addTarget(surface);
             cameraDevice.createCaptureSession(Arrays.asList(surface), new CameraCaptureSession.StateCallback() {
                 @Override
                 public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
-                    if(cameraDevice == null)
+                    if (cameraDevice == null)
                         return;
                     cameraCaptureSessions = cameraCaptureSession;
                     updatePreview();
@@ -431,18 +540,18 @@ public class RedeemPicActivity extends AppCompatActivity {
                 public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
                     Toast.makeText(RedeemPicActivity.this, "Changed", Toast.LENGTH_SHORT).show();
                 }
-            },null);
+            }, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
 
     private void updatePreview() {
-        if(cameraDevice == null)
+        if (cameraDevice == null)
             Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
-        captureRequestBuilder.set(CaptureRequest.CONTROL_MODE,CaptureRequest.CONTROL_MODE_AUTO);
-        try{
-            cameraCaptureSessions.setRepeatingRequest(captureRequestBuilder.build(),null,mBackgroundHandler);
+        captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
+        try {
+            cameraCaptureSessions.setRepeatingRequest(captureRequestBuilder.build(), null, mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -450,23 +559,22 @@ public class RedeemPicActivity extends AppCompatActivity {
 
 
     private void openCamera() {
-        CameraManager manager = (CameraManager)getSystemService(Context.CAMERA_SERVICE);
-        try{
+        CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        try {
             cameraId = manager.getCameraIdList()[0];
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             assert map != null;
             imageDimension = map.getOutputSizes(SurfaceTexture.class)[0];
             //Check realtime permission if run higher API 23
-            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-            {
-                ActivityCompat.requestPermissions(this,new String[]{
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{
                         Manifest.permission.CAMERA,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
-                },REQUEST_CAMERA_PERMISSION);
+                }, REQUEST_CAMERA_PERMISSION);
                 return;
             }
-            manager.openCamera(cameraId,stateCallback,null);
+            manager.openCamera(cameraId, stateCallback, null);
 
         } catch (CameraAccessException e) {
             e.printStackTrace();
@@ -497,10 +605,8 @@ public class RedeemPicActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == REQUEST_CAMERA_PERMISSION)
-        {
-            if(grantResults[0] != PackageManager.PERMISSION_GRANTED)
-            {
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "You can't use camera without permission", Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -511,7 +617,7 @@ public class RedeemPicActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         startBackgroundThread();
-        if(textureView.isAvailable())
+        if (textureView.isAvailable())
             openCamera();
         else
             textureView.setSurfaceTextureListener(textureListener);
@@ -525,9 +631,9 @@ public class RedeemPicActivity extends AppCompatActivity {
 
     private void stopBackgroundThread() {
         mBackgroundThread.quitSafely();
-        try{
+        try {
             mBackgroundThread.join();
-            mBackgroundThread= null;
+            mBackgroundThread = null;
             mBackgroundHandler = null;
         } catch (InterruptedException e) {
             e.printStackTrace();
