@@ -157,6 +157,17 @@ public class RedeemPicActivity extends AppCompatActivity {
             Intent intentNew = new Intent(RedeemPicActivity.this, RedeemQRActivity.class);
             startActivity(intentNew);
         }
+
+        title="Snap a Pic";
+
+        message = "To make sure that you are actually submitting acceptable M-Waste, take a picture of the M-Waste. Make sure the image is in focus and centered.";
+
+        redeemMessage(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
     }
 
     private void takePicture() {
@@ -349,8 +360,12 @@ public class RedeemPicActivity extends AppCompatActivity {
                                         });
                                     } else {
                                         title = "Redemption Error";
-                                        if (response.body() != null) {
-                                            message = response.body().toString();
+                                        if (response.errorBody() != null) {
+                                            try {
+                                                message = response.errorBody().string();
+                                            } catch (IOException e) {
+                                                message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
+                                            }
                                         } else {
                                             message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
                                         }

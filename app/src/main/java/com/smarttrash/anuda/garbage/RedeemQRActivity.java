@@ -119,6 +119,17 @@ public class RedeemQRActivity extends AppCompatActivity implements NavigationVie
 
         getLastLocation();
 
+        title="QR Code";
+
+        message = "Please scan the QR code at the front of the bin. Line up the code in the square frame on screen.";
+
+        redeemMessage(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
 
 
         verifyBtn.setOnClickListener(new View.OnClickListener() {
@@ -128,6 +139,7 @@ public class RedeemQRActivity extends AppCompatActivity implements NavigationVie
                 verifyBtn.setEnabled(false);
 
                 barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
+
                     @Override
                     public void release() {
                     }
@@ -172,7 +184,11 @@ public class RedeemQRActivity extends AppCompatActivity implements NavigationVie
                                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                                             progressDialog.dismiss();
                                             if (response.code() == 200) {
-                                                location="Akurana";
+                                                try {
+                                                    location=response.body().string();
+                                                } catch (IOException e) {
+                                                    location=null;
+                                                }
 
                                                 Bundle bundle = new Bundle();
                                                 bundle.putDouble("lat",currentlat);
@@ -187,8 +203,12 @@ public class RedeemQRActivity extends AppCompatActivity implements NavigationVie
 
                                             }else {
                                                 title = "Redemption Error";
-                                                if(response.body()!=null){
-                                                    message = response.body().toString();
+                                                if(response.errorBody()!=null){
+                                                    try {
+                                                        message = response.errorBody().string();
+                                                    } catch (IOException e) {
+                                                        message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
+                                                    }
                                                 }else{
                                                     message = "Unfortunately we encountered an error while verifying your disposal. Please try again.";
                                                 }
@@ -351,11 +371,9 @@ public class RedeemQRActivity extends AppCompatActivity implements NavigationVie
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
 
-                            currentlat=7.36538;
-                            currentlng=80.616689;
 
-//                            currentlat=location.getLatitude();
-//                            currentlng=location.getLongitude();
+                            currentlat=location.getLatitude();
+                            currentlng=location.getLongitude();
 
                         }else{
 
