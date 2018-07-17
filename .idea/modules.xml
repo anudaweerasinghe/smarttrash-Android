@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Garbage.iml" filepath="$PROJECT_DIR$/Garbage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SmartTrash-android.iml" filepath="$PROJECT_DIR$/SmartTrash-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ideatrash-android.iml" filepath="$PROJECT_DIR$/ideatrash-android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/smarttrash-android.iml" filepath="$PROJECT_DIR$/smarttrash-android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/smarttrash-android-2.iml" filepath="$PROJECT_DIR$/smarttrash-android-2.iml" />
     </modules>
   </component>
 </project>
